@@ -1,0 +1,3 @@
+@model IEnumerable<ServiceRequest>
+@{ ViewData["Title"] = "Service Requests"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h1>Service requests</h1><a asp-action="Create" class="btn btn-primary">New request</a></div><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Type</th><th>Resident</th><th>Description</th><th>Created</th><th>Status</th><th></th></tr></thead><tbody>@foreach (var request in Model) { <tr><td>@request.RequestType</td><td>@request.ResidentId</td><td>@request.Description</td><td>@request.CreatedAt.ToLocalTime()</td><td>@request.Status</td><td>@if (User.IsInRole("Administrator")) { <a asp-action="UpdateStatus" asp-route-id="@request.Id">Update</a> }</td></tr> }</tbody></table></div>

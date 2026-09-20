@@ -7,6 +7,7 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" media="print" />
     <link rel="stylesheet" href="~/WaterSupply.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
@@ -32,6 +33,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="WaterConnections" asp-action="Index">Connections</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Bills" asp-action="Index">Bills</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="ServiceRequests" asp-action="Index">Requests</a>
+                        </li>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Reports" asp-action="OutstandingBills">Reports</a></li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
