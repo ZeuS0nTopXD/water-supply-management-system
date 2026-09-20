@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WaterSupply.Web\WaterSupply.Web.csproj" />
+    <ProjectReference Include="..\..\Shared\WaterSupply.Domain\WaterSupply.Domain.csproj" />
   </ItemGroup>
 
 </Project>
