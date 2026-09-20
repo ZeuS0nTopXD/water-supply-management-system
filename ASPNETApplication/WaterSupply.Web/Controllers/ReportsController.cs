@@ -7,7 +7,7 @@ using WaterSupply.Web.Models.ReportViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public sealed class ReportsController : Controller
 {
     private readonly ApplicationDbContext _context;

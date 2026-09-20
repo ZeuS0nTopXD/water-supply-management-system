@@ -38,7 +38,7 @@ public sealed class ServiceRequestsController : Controller
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             model.ResidentId = await _context.Residents.Where(resident => resident.IdentityUserId == userId).Select(resident => resident.Id).SingleOrDefaultAsync();
         }
-        ViewBag.Connections = await _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
+        await LoadConnectionsAsync(model.ResidentId);
         return View(model);
     }
 
@@ -51,16 +51,25 @@ public sealed class ServiceRequestsController : Controller
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             model.ResidentId = await _context.Residents.Where(resident => resident.IdentityUserId == userId).Select(resident => resident.Id).SingleOrDefaultAsync();
         }
+        if (model.WaterConnectionId.HasValue && !await _context.WaterConnections.AnyAsync(connection => connection.Id == model.WaterConnectionId.Value && connection.ResidentId == model.ResidentId))
+            ModelState.AddModelError(nameof(model.WaterConnectionId), "The selected connection does not belong to this resident.");
         if (!ModelState.IsValid || model.ResidentId <= 0)
         {
             if (model.ResidentId <= 0) ModelState.AddModelError(nameof(model.ResidentId), "A resident account is required.");
-            ViewBag.Connections = await _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
+            await LoadConnectionsAsync(model.ResidentId);
             return View(model);
         }
 
         _context.ServiceRequests.Add(ServiceRequest.Create(model.ResidentId, model.WaterConnectionId, model.RequestType, model.Description, DateTime.UtcNow));
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task LoadConnectionsAsync(int residentId)
+    {
+        var query = _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber);
+        if (!User.IsInRole("Administrator")) query = query.Where(connection => connection.ResidentId == residentId).OrderBy(connection => connection.ConnectionNumber);
+        ViewBag.Connections = await query.ToListAsync();
     }
 
     [Authorize(Roles = "Administrator")]

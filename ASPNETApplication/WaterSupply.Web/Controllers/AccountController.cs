@@ -27,7 +27,12 @@ public sealed class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(model);
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded) return LocalRedirect(model.ReturnUrl ?? "/Dashboard");
+        if (result.Succeeded)
+        {
+            var signedInUser = await _userManager.FindByEmailAsync(model.Email);
+            if (signedInUser is not null && await _userManager.IsInRoleAsync(signedInUser, "Resident")) return LocalRedirect(model.ReturnUrl ?? "/ResidentPortal");
+            return LocalRedirect(model.ReturnUrl ?? "/Dashboard");
+        }
         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         return View(model);
     }

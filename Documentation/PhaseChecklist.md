@@ -18,3 +18,4 @@
 | Service worker/offline access | `service-worker.js`, `offline.html` | Complete |
 | Notifications | `pwa-notifications.js` permission flow | Complete |
 | GitHub-ready repository structure | Root folders and documentation | Complete |
+| Final verification evidence | `Documentation/VerificationResults.md` | Complete |

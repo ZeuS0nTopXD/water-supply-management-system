@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WaterSupply.Domain.Entities;
 using WaterSupply.Domain.Exceptions;
 using WaterSupply.Web.Data;
@@ -18,6 +19,13 @@ public sealed class BillsController : Controller
     public async Task<IActionResult> Index(string? status, int? waterConnectionId)
     {
         var query = _context.Bills.AsNoTracking();
+        if (!User.IsInRole("Administrator"))
+        {
+            var residentId = await CurrentResidentIdAsync();
+            query = residentId.HasValue
+                ? query.Where(bill => _context.WaterConnections.Any(connection => connection.Id == bill.WaterConnectionId && connection.ResidentId == residentId.Value))
+                : query.Where(_ => false);
+        }
         if (Enum.TryParse<WaterSupply.Domain.Enums.BillStatus>(status, true, out var selectedStatus)) query = query.Where(bill => bill.Status == selectedStatus);
         if (waterConnectionId.HasValue) query = query.Where(bill => bill.WaterConnectionId == waterConnectionId.Value);
         ViewData["Status"] = status;
@@ -27,7 +35,13 @@ public sealed class BillsController : Controller
     public async Task<IActionResult> Details(int? id)
     {
         var bill = id is null ? null : await _context.Bills.AsNoTracking().SingleOrDefaultAsync(item => item.Id == id);
-        return bill is null ? NotFound() : View(bill);
+        if (bill is null) return NotFound();
+        if (!User.IsInRole("Administrator"))
+        {
+            var residentId = await CurrentResidentIdAsync();
+            if (!residentId.HasValue || !await _context.WaterConnections.AnyAsync(connection => connection.Id == bill.WaterConnectionId && connection.ResidentId == residentId.Value)) return Forbid();
+        }
+        return View(bill);
     }
 
     [Authorize(Roles = "Administrator")]
@@ -64,4 +78,10 @@ public sealed class BillsController : Controller
     }
 
     private async Task LoadConnectionsAsync() => ViewBag.Connections = await _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
+
+    private async Task<int?> CurrentResidentIdAsync()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return await _context.Residents.Where(resident => resident.IdentityUserId == userId).Select(resident => (int?)resident.Id).SingleOrDefaultAsync();
+    }
 }

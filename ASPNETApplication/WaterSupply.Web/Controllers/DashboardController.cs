@@ -4,7 +4,7 @@ using WaterSupply.Web.Services;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public sealed class DashboardController : Controller
 {
     private readonly DashboardQueryService _dashboardQuery;
