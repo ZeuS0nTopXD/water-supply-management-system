@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WaterSupply.Application\WaterSupply.Application.csproj" />
+    <ProjectReference Include="..\WaterSupply.Domain\WaterSupply.Domain.csproj" />
   </ItemGroup>
 
 </Project>
