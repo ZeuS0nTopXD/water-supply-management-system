@@ -45,6 +45,13 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
-await DbInitializer.InitializeAsync(app.Services);
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    await DbInitializer.InitializeAsync(app.Services);
+}
 
 app.Run();
+
+public partial class Program
+{
+}

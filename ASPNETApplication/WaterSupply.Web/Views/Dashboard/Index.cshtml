@@ -1,0 +1,11 @@
+@model WaterSupply.Web.Models.DashboardSummaryViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h1>Water Supply Dashboard</h1><span class="badge text-bg-success">Online portal</span></div>
+<div class="row g-3">
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Residents</h2><p class="display-6">@Model.ResidentCount</p></div></div></div>
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Active connections</h2><p class="display-6">@Model.ActiveConnectionCount</p></div></div></div>
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Current consumption</h2><p class="display-6">@Model.CurrentMonthConsumption.ToString("0.##")</p></div></div></div>
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Unpaid amount</h2><p class="display-6">@Model.UnpaidBillAmount.ToString("C")</p></div></div></div>
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Collections</h2><p class="display-6">@Model.CollectionAmount.ToString("C")</p></div></div></div>
+    <div class="col-6 col-lg-4"><div class="card h-100"><div class="card-body"><h2 class="h6">Open requests</h2><p class="display-6">@Model.OpenServiceRequestCount</p></div></div></div>
+</div>
