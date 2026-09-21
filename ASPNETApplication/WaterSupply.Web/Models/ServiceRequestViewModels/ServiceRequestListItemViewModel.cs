@@ -1,10 +1,12 @@
 using WaterSupply.Domain.Enums;
 
-namespace WaterSupply.Web.Models;
+namespace WaterSupply.Web.Models.ServiceRequestViewModels;
 
-public sealed class DashboardRequestViewModel
+public sealed class ServiceRequestListItemViewModel
 {
     public int ServiceRequestId { get; init; }
+    public int ResidentId { get; init; }
+    public string ResidentName { get; init; } = string.Empty;
     public RequestType RequestType { get; init; }
     public string Description { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }

@@ -39,6 +39,8 @@ public sealed class DashboardQueryTests
         summary.InProgressServiceRequestCount.Should().Be(0);
         summary.ClosedServiceRequestCount.Should().Be(0);
         summary.SelectedMonth.Should().Be(new DateOnly(2026, 9, 1));
-        summary.RecentRequests.Should().ContainSingle(request => request.Description == "Leak");
+        var recentRequest = summary.RecentRequests.Should().ContainSingle(request => request.Description == "Leak").Subject;
+        recentRequest.RequestTypeLabel.Should().Be("Leak");
+        recentRequest.StatusLabel.Should().Be("Open");
     }
 }

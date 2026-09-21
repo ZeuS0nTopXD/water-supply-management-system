@@ -2,15 +2,16 @@
 @{ ViewData["Title"] = "Dashboard"; }
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-3">
     <div><h1 class="mb-1">Dashboard</h1><p class="text-muted mb-0">Water supply overview for @Model.SelectedMonth.ToString("MMMM yyyy")</p></div>
-    <div class="d-flex flex-column flex-sm-row align-items-sm-end gap-2">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-end gap-2 no-print">
         <form method="get" class="d-flex align-items-end gap-2">
             <div><label for="month" class="form-label mb-1">Reporting month</label><input id="month" name="month" type="month" value="@Model.SelectedMonthValue" class="form-control" /></div>
             <button class="btn btn-primary" type="submit">Apply</button>
         </form>
         <a class="btn btn-outline-secondary" asp-controller="Reports" asp-action="Index">View reports</a>
+        <button class="btn btn-outline-secondary" type="button" onclick="window.print()">Print dashboard</button>
     </div>
 </div>
-<div class="d-flex flex-wrap gap-2 mb-4">
+<div class="d-flex flex-wrap gap-2 mb-4 no-print">
     <a class="btn btn-sm btn-outline-primary" asp-controller="Residents" asp-action="Create">Add resident</a>
     <a class="btn btn-sm btn-outline-primary" asp-controller="WaterConnections" asp-action="Create">Add connection</a>
     <a class="btn btn-sm btn-outline-primary" asp-controller="MeterReadings" asp-action="Create">Record reading</a>
@@ -40,10 +41,10 @@
             <div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Type</th><th>Description</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>
                 @foreach (var request in Model.RecentRequests)
                 {
-                    <tr><td>@request.RequestType</td><td>@request.Description</td><td><span class="badge text-bg-light">@request.Status</span></td><td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td><td><a asp-controller="ServiceRequests" asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update</a></td></tr>
+                    <tr><td>@request.RequestTypeLabel</td><td>@request.Description</td><td><span class="badge text-bg-light">@request.StatusLabel</span></td><td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td><td><a asp-controller="ServiceRequests" asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update</a></td></tr>
                 }
             </tbody></table></div>
         }
     </div>
 </div>
-<button class="btn btn-outline-primary mt-3" type="button" onclick="WaterSupplyPwa.requestBillReminderPermission()">Enable reminders</button>
+<button class="btn btn-outline-primary mt-3 no-print" type="button" onclick="WaterSupplyPwa.requestBillReminderPermission()">Enable reminders</button>

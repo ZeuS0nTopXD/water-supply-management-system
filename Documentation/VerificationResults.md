@@ -4,7 +4,7 @@ The final verification commands are recorded here after running them in the proj
 
 | Check | Result |
 | --- | --- |
-| `dotnet test WaterSupplyManagement.sln --no-restore` | PASS — 18 tests passed |
+| `dotnet test WaterSupplyManagement.sln --no-restore` | PASS — 20 tests passed |
 | `dotnet build WaterSupplyManagement.sln --configuration Release --no-restore` | PASS — 0 errors |
 | Console smoke input | Passed: menu displayed and option 0 exited cleanly |
 | `Database/SQLScripts/verify-schema.ps1` | PASS — five tables, primary keys, and relationships |

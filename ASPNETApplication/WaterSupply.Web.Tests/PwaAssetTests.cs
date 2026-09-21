@@ -37,4 +37,14 @@ public sealed class PwaAssetTests
         var worker = File.ReadAllText(Path.Combine(WebRoot, "service-worker.js"));
         worker.Should().Contain("notification");
     }
+
+    [Fact]
+    public void Dashboard_has_a_print_action_for_presentation_reports()
+    {
+        var path = Path.Combine(WebRoot, "../Views/Dashboard/Index.cshtml");
+        var source = File.ReadAllText(Path.GetFullPath(path));
+
+        source.Should().Contain("window.print()");
+        source.Should().Contain("no-print");
+    }
 }

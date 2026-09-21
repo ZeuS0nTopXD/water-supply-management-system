@@ -10,7 +10,28 @@ namespace WaterSupply.Web.Controllers;
 [Authorize]
 public sealed class ServiceRequestsController(ApplicationDbContext context) : Controller
 {
-    public async Task<IActionResult> Index() => View(await context.ServiceRequests.AsNoTracking().OrderByDescending(request => request.CreatedAt).ToListAsync());
+    public async Task<IActionResult> Index()
+    {
+        var residents = await context.Residents
+            .AsNoTracking()
+            .ToDictionaryAsync(resident => resident.ResidentId, resident => resident.FullName);
+        var requests = await context.ServiceRequests
+            .AsNoTracking()
+            .OrderByDescending(request => request.CreatedAt)
+            .ToListAsync();
+        var model = requests.Select(request => new ServiceRequestListItemViewModel
+        {
+            ServiceRequestId = request.ServiceRequestId,
+            ResidentId = request.ResidentId,
+            ResidentName = residents.GetValueOrDefault(request.ResidentId, $"Resident #{request.ResidentId}"),
+            RequestType = request.RequestType,
+            Description = request.Description,
+            CreatedAt = request.CreatedAt,
+            Status = request.Status
+        });
+
+        return View(model);
+    }
 
     public async Task<IActionResult> Create()
     {
