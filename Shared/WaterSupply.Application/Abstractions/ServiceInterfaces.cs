@@ -6,40 +6,35 @@ namespace WaterSupply.Application.Abstractions;
 
 public interface IResidentService
 {
-    Resident Create(string fullName, string email, string phone, string address, DateOnly registrationDate, string? identityUserId = null);
-    IReadOnlyList<Resident> Search(string query);
-    void Delete(int residentId);
+    Resident Create(string fullName, string email, string phone, string address, DateOnly registrationDate);
+    IReadOnlyList<Resident> Search(string? query);
 }
 
 public interface IWaterConnectionService
 {
-    WaterConnection Create(int residentId, string connectionNumber, ConnectionType connectionType, string meterNumber, DateOnly connectionDate);
-    IReadOnlyList<WaterConnection> Search(string query);
+    WaterConnection Create(int residentId, string connectionNumber, ConnectionType type, string meterNumber, DateOnly connectionDate);
+    IReadOnlyList<WaterConnection> Search(string? query);
 }
 
 public interface IMeterReadingService
 {
-    MeterReading Record(int waterConnectionId, DateOnly readingDate, decimal previousReading, decimal currentReading);
+    MeterReading Record(int connectionId, DateOnly date, decimal previousReading, decimal currentReading);
 }
 
 public interface IBillingService
 {
-    Bill GenerateBill(int waterConnectionId, DateOnly billingPeriodStart, DateOnly billingPeriodEnd, decimal unitsConsumed, decimal ratePerUnit, decimal fixedCharge, decimal taxAmount, DateOnly dueDate);
-    Payment RecordPayment(int billId, decimal amount, PaymentMethod paymentMethod, DateTime paymentDate);
-    IReadOnlyList<Bill> SearchBills(string? status, DateOnly? from, DateOnly? to);
-    IReadOnlyList<Bill> GetBillsForResident(int residentId);
+    Bill Generate(int connectionId, int readingId, DateOnly billDate, int units, decimal rate);
+    IReadOnlyList<Bill> GetAll();
 }
 
 public interface IServiceRequestService
 {
-    ServiceRequest Create(int residentId, int? waterConnectionId, ServiceRequestType requestType, string description);
-    IReadOnlyList<ServiceRequest> Search(string? status, int? residentId = null);
-    void UpdateStatus(int requestId, ServiceRequestStatus status, string? staffNotes = null);
+    ServiceRequest Create(int residentId, int? connectionId, RequestType type, string description);
+    IReadOnlyList<ServiceRequest> Search(RequestStatus? status = null, int? residentId = null);
+    void UpdateStatus(int requestId, RequestStatus status, string? notes = null);
 }
 
 public interface IReportService
 {
-    ConsumptionReport GetConsumptionReport(DateOnly from, DateOnly to);
-    PaymentCollectionReport GetPaymentCollectionReport(DateOnly from, DateOnly to);
-    OutstandingBillsReport GetOutstandingBillsReport();
+    SummaryReport GetSummary();
 }

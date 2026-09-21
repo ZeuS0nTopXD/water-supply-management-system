@@ -9,45 +9,25 @@ public enum ConnectionType
 public enum ConnectionStatus
 {
     Active,
-    Suspended,
-    Closed
+    Inactive
 }
 
 public enum BillStatus
 {
     Unpaid,
-    PartiallyPaid,
-    Paid,
-    Overdue
+    Paid
 }
 
-public enum PaymentMethod
+public enum RequestType
 {
-    Cash,
-    Online,
-    BankTransfer
-}
-
-public enum ServiceRequestType
-{
-    Leakage,
-    LowPressure,
-    NewConnection,
-    BillingQuery,
+    Leak,
+    NoSupply,
     Other
 }
 
-public enum ServiceRequestStatus
+public enum RequestStatus
 {
     Open,
     InProgress,
-    Resolved,
-    Rejected
-}
-
-public enum NotificationType
-{
-    BillReminder,
-    ServiceRequestUpdate,
-    System
+    Closed
 }

@@ -2,9 +2,13 @@ using WaterSupply.Domain.Exceptions;
 
 namespace WaterSupply.Domain.Entities;
 
-public abstract class Person : Entity
+public abstract class Person
 {
-    protected Person(int id, string fullName, string email, string phone, string address) : base(id)
+    protected Person()
+    {
+    }
+
+    protected Person(string fullName, string email, string phone, string address)
     {
         FullName = Required(fullName, nameof(fullName));
         Email = Required(email, nameof(email));
@@ -12,14 +16,10 @@ public abstract class Person : Entity
         Address = Required(address, nameof(address));
     }
 
-    protected Person()
-    {
-    }
-
-    public string FullName { get; protected set; } = string.Empty;
-    public string Email { get; protected set; } = string.Empty;
-    public string Phone { get; protected set; } = string.Empty;
-    public string Address { get; protected set; } = string.Empty;
+    public string FullName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string Phone { get; private set; } = string.Empty;
+    public string Address { get; private set; } = string.Empty;
 
     public void UpdateContact(string fullName, string email, string phone, string address)
     {
@@ -29,13 +29,9 @@ public abstract class Person : Entity
         Address = Required(address, nameof(address));
     }
 
-    private static string Required(string value, string name)
+    protected static string Required(string value, string name)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new DomainValidationException($"{name} is required.");
-        }
-
+        if (string.IsNullOrWhiteSpace(value)) throw new DomainValidationException($"{name} is required.");
         return value.Trim();
     }
 }

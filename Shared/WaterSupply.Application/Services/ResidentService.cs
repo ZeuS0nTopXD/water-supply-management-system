@@ -1,32 +1,28 @@
 using WaterSupply.Application.Abstractions;
+using WaterSupply.Application.InMemory;
 using WaterSupply.Domain.Entities;
 
 namespace WaterSupply.Application.Services;
 
 public sealed class ResidentService : IResidentService
 {
-    private readonly IRepository<Resident> _residents;
+    private readonly InMemoryWaterSupplyStore _store;
 
-    public ResidentService(IRepository<Resident> residents)
-    {
-        _residents = residents;
-    }
+    public ResidentService(InMemoryWaterSupplyStore store) => _store = store;
 
-    public Resident Create(string fullName, string email, string phone, string address, DateOnly registrationDate, string? identityUserId = null)
+    public Resident Create(string fullName, string email, string phone, string address, DateOnly registrationDate)
     {
-        var resident = new Resident(0, fullName, email, phone, address, registrationDate, identityUserId);
-        _residents.Add(resident);
+        var resident = new Resident(_store.Residents.Count + 1, fullName, email, phone, address, registrationDate);
+        _store.Residents.Add(resident);
         return resident;
     }
 
-    public IReadOnlyList<Resident> Search(string query)
+    public IReadOnlyList<Resident> Search(string? query)
     {
         var normalized = query?.Trim() ?? string.Empty;
-        if (normalized.Length == 0) return _residents.GetAll();
-        return _residents.GetAll().Where(resident => resident.FullName.Contains(normalized, StringComparison.OrdinalIgnoreCase)
+        if (normalized.Length == 0) return _store.Residents;
+        return _store.Residents.Where(resident => resident.FullName.Contains(normalized, StringComparison.OrdinalIgnoreCase)
             || resident.Email.Contains(normalized, StringComparison.OrdinalIgnoreCase)
             || resident.Phone.Contains(normalized, StringComparison.OrdinalIgnoreCase)).ToList();
     }
-
-    public void Delete(int residentId) => _residents.Delete(residentId);
 }
