@@ -2,35 +2,44 @@
 
 ## 1. Purpose
 
-The Water Supply Management System gives water utility staff a single place to maintain residents and connections, record meter readings, generate bills, receive payments, track service requests, and produce management reports. Residents can sign in to view their own portal data and raise requests.
+The Water Supply Management System gives utility staff a simple application for maintaining residents and water connections, recording meter readings, creating bills, handling service requests, and viewing reports.
 
-## 2. Actors
+## 2. Project phases
+
+| Phase | Purpose | Deliverable |
+| --- | --- | --- |
+| 1 | Learn OOP and implement reusable business logic | Menu-driven console application |
+| 2 | Build the database-driven system | ASP.NET Core MVC application with Identity and SQL Server |
+| 3 | Extend the system for mobile users | Installable PWA with offline shell and notifications |
+
+## 3. Actors
 
 | Actor | Capabilities |
 | --- | --- |
-| Administrator | Maintain residents/connections, record readings, generate bills, record payments, update requests, view reports and dashboard metrics |
-| Resident | Sign in, view own bills, create and track own service requests, change password |
+| Administrator | Sign in, manage records, view dashboard, update service requests, and print reports |
+| Staff user | Sign in, search records, record readings, create bills, and view requests |
 
-## 3. Functional requirements
+## 4. Functional requirements
 
-- Authentication: login, logout, role-aware authorization, change password.
-- Resident and water-connection master management: add, update, delete, search.
-- Meter readings: record readings and derive consumption with validation against decreasing readings and duplicate dates.
-- Billing: calculate total from units, rate, fixed charge, and tax; track paid and outstanding balances.
-- Payments: validate amount against outstanding balance and update bill status.
-- Service requests: create, filter, and update status with staff notes.
-- Dashboard: resident count, active connection count, current-month consumption, unpaid amount, collections, and open request count.
-- Reports: outstanding bills, consumption, and payment reports with filters and browser print support.
-- PWA: install manifest, service worker, offline shell, responsive layout, and notification permission flow.
+- Console: menu-driven interface, OOP classes/objects, inheritance, encapsulation, exception handling, collections, search, and reports.
+- Authentication: login, logout, and change password.
+- Master management: add, update, delete, and search resident records; add and search water connections.
+- Operations: record meter readings, calculate consumption, create bills, and add/update service requests.
+- Dashboard: resident count, active connection count, monthly consumption, unpaid bill amount, and open request count.
+- Reports: filter bills by status or connection and print the report from the browser.
+- PWA: responsive interface, install manifest, service worker, offline fallback, and browser notification permission flow.
 
-## 4. Non-functional requirements
+## 5. Out of scope
 
-- Use normalized relational data with primary and foreign keys.
-- Enforce domain validation and server-side authorization.
-- Keep business rules reusable between the console and ASP.NET layers.
-- Provide mobile-friendly layouts and an offline fallback for the application shell.
-- Use SQL Server for deployment and tests for critical business logic.
+Payments, payment gateways, a separate resident portal, a notifications business table, SMS/email delivery, and advanced approval workflows are intentionally excluded from this basic academic version.
 
-## 5. Data model
+## 6. Non-functional requirements
 
-The database contains seven business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, `Payments`, `ServiceRequests`, and `Notifications`. ASP.NET Identity tables provide authentication storage. See `Database/ERDiagram/water-supply-er-diagram.mmd`.
+- Use normalized SQL Server tables with primary and foreign keys.
+- Keep domain rules reusable between console and web layers.
+- Validate input and handle expected exceptions without crashing the application.
+- Provide a mobile-friendly layout and an offline application shell.
+
+## 7. Data model
+
+The five business tables are `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. ASP.NET Identity supplies its own authentication tables. See `Database/ERDiagram/water-supply-er-diagram.mmd`.

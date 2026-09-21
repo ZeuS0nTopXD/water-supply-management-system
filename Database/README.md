@@ -1,12 +1,20 @@
 # Database
 
-The SQL Server database is named `WaterSupplyManagement` and contains seven normalized business tables. Run the scripts in this order using SQL Server Management Studio or `sqlcmd`:
+The SQL Server database is named `WaterSupplyManagement` and contains five normalized business tables:
 
-1. `001_CreateDatabase.sql`
-2. `002_CreateTables.sql`
-3. `003_SeedReferenceData.sql`
-4. `004_SeedDemoData.sql`
+1. `Residents`
+2. `WaterConnections`
+3. `MeterReadings`
+4. `Bills`
+5. `ServiceRequests`
 
-The schema uses primary keys on every table, foreign keys for all relationships, unique connection/reference values, and check constraints for statuses and non-negative amounts. The source ER diagram is `ERDiagram/water-supply-er-diagram.mmd`.
+Run the scripts in this order using SQL Server Management Studio or `sqlcmd`:
 
-Run `powershell -ExecutionPolicy Bypass -File SQLScripts/verify-schema.ps1` to check the script text for all seven tables and required relationships. A live SQL Server instance is required to execute the scripts; the verifier does not replace SQL Server execution.
+1. `SQLScripts/001_CreateDatabase.sql`
+2. `SQLScripts/002_CreateTables.sql`
+3. `SQLScripts/003_SeedReferenceData.sql`
+4. `SQLScripts/004_SeedDemoData.sql`
+
+Every business table has a primary key. Foreign keys connect residents to connections and requests, connections to readings/bills/requests, and readings to bills. The source ER diagram is `ERDiagram/water-supply-er-diagram.mmd`.
+
+Run `powershell -ExecutionPolicy Bypass -File SQLScripts/verify-schema.ps1` to check the script text. A live SQL Server instance is required to execute the scripts.

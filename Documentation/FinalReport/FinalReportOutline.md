@@ -14,7 +14,7 @@ Three-phase architecture, OOP model, ASP.NET MVC structure, authorization bounda
 
 ## 4. Implementation
 
-Console features, Identity authentication, master management, reading/billing/payment workflows, dashboards, reports, and PWA assets.
+Console features, Identity authentication, master management, reading/billing/request workflows, dashboards, reports, and PWA assets.
 
 ## 5. Testing and evidence
 

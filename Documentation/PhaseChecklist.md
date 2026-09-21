@@ -13,7 +13,7 @@
 | Dashboard metrics | `DashboardQueryService` and Dashboard view | Complete |
 | Search/filter and printable reports | `ReportsController`, report views, `print.css` | Complete |
 | SQL Server, keys, relationships | `Database/SQLScripts` and EF model | Complete |
-| Five-to-ten normalized tables | Seven business tables | Complete |
+| Five-to-ten normalized tables | Five business tables | Complete |
 | Responsive/installable PWA | Manifest, responsive layout, SVG icons | Complete |
 | Service worker/offline access | `service-worker.js`, `offline.html` | Complete |
 | Notifications | `pwa-notifications.js` permission flow | Complete |

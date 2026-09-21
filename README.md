@@ -1,51 +1,52 @@
 # Water Supply Management System
 
-This repository is a three-phase .NET project for managing municipal water connections, meter readings, billing, payments, service requests, residents, and operational reports.
+A deliberately basic three-phase .NET project for learning OOP, ASP.NET Core MVC, SQL Server, and Progressive Web Applications.
 
 ## Repository structure
 
 ```text
 WaterSupplyManagementSystem/
-├── ConsoleApplication/       # Phase 1: menu-driven OOP console application
+├── ConsoleApplication/       # Phase 1: menu-driven OOP console app
 ├── ASPNETApplication/         # Phase 2: ASP.NET Core MVC + Identity + EF Core
-├── PWA/                       # Phase 3 notes and mobile/offline behavior
+├── PWA/                       # Phase 3 notes; assets are shared with the web app
 ├── Shared/                    # reusable domain and application services
 ├── Database/                  # SQL Server scripts and Mermaid ER diagram
-├── Documentation/             # SRS, presentation outline, report outline
+├── Documentation/             # SRS, presentation, report, and checklists
 └── README.md
 ```
 
-## Technology stack
+## Basic scope
 
-- .NET 10, C# and nullable reference types
+The project manages five business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. It intentionally excludes payments, notifications as a business table, resident portals, and advanced workflows so the project remains easy to understand.
+
+## Technology
+
+- .NET 10 and C#
 - ASP.NET Core MVC and ASP.NET Core Identity
-- Entity Framework Core with SQL Server provider
-- SQL Server schema with seven normalized business tables
-- Bootstrap responsive UI, web manifest, service worker, offline shell
+- Entity Framework Core with SQL Server
+- Bootstrap responsive UI, web manifest, service worker, offline page, and browser notifications
 - xUnit and FluentAssertions tests
 
-## Run Phase 1
+## Run the console application
 
 ```powershell
 dotnet run --project ConsoleApplication/WaterSupply.Console
 ```
 
-The console app is seeded with demo residents, connections, readings, bills, payments, and service requests. Its menu includes CRUD-style operations, search, and reports.
+The console menu supports adding/listing/searching residents, adding connections, recording readings, viewing bills, adding requests, and viewing a summary report. It starts with small demo data.
 
-## Run Phase 2 and Phase 3
+## Run the web application and PWA
 
 1. Start SQL Server or LocalDB.
-2. Update `ASPNETApplication/WaterSupply.Web/appsettings.json` if your server instance differs.
-3. Apply the schema with `Database/SQLScripts/001_CreateDatabase.sql` followed by `002_CreateTables.sql`. Optional demo data is in `003_SeedReferenceData.sql` and `004_SeedDemoData.sql`.
+2. Run `Database/SQLScripts/001_CreateDatabase.sql`, then `002_CreateTables.sql`, `003_SeedReferenceData.sql`, and optionally `004_SeedDemoData.sql`.
+3. Update `ASPNETApplication/WaterSupply.Web/appsettings.json` if your SQL Server instance differs.
 4. Run:
 
 ```powershell
 dotnet run --project ASPNETApplication/WaterSupply.Web
 ```
 
-The development seed creates `admin@watersupply.local` / `Admin@12345` and `resident@watersupply.local` / `Resident@12345`. Change these credentials before any real deployment.
-
-The PWA is the same web application opened on a mobile browser. It exposes an install manifest, service worker, cached offline shell, responsive forms, and browser notification permission flow.
+The development initializer creates `admin@watersupply.local` / `Admin@12345` and `resident@watersupply.local` / `Resident@12345`. Change these before real deployment. Open the site on a mobile browser and use the browser install action to install the PWA.
 
 ## Test and build
 
@@ -55,8 +56,4 @@ dotnet test WaterSupplyManagement.sln
 dotnet build WaterSupplyManagement.sln --configuration Release
 ```
 
-The repository includes a PowerShell rubric verifier at `Documentation/verify-rubric.ps1` and a database schema verifier at `Database/SQLScripts/verify-schema.ps1`.
-
-## Scope note
-
-Database connectivity is intentionally configured for SQL Server. If SQL Server is unavailable on the development machine, application compilation and tests still run with the EF Core InMemory provider in the test project, but live database initialization must be completed on a machine with SQL Server access.
+The repository includes `Documentation/verify-rubric.ps1` and `Database/SQLScripts/verify-schema.ps1` for checklist verification. SQL Server is required for live database execution; automated web tests use EF Core InMemory.

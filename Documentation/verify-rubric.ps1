@@ -25,9 +25,9 @@ $webRoot = Join-Path $repoRoot 'ASPNETApplication/WaterSupply.Web/wwwroot'
 }
 
 $sql = Get-Content (Join-Path $repoRoot 'Database/SQLScripts/002_CreateTables.sql') -Raw
-foreach ($table in @('Residents', 'WaterConnections', 'MeterReadings', 'Bills', 'Payments', 'ServiceRequests', 'Notifications')) {
+foreach ($table in @('Residents', 'WaterConnections', 'MeterReadings', 'Bills', 'ServiceRequests')) {
     if ($sql -notmatch "CREATE TABLE dbo\.$table") { Write-Error "FAIL: missing table $table" }
 }
-if (($sql -split 'FOREIGN KEY').Count -lt 6) { Write-Error 'FAIL: expected foreign-key relationships were not found' }
+if (($sql -split 'FOREIGN KEY').Count -lt 5) { Write-Error 'FAIL: expected foreign-key relationships were not found' }
 
-Write-Output 'PASS: repository structure, documentation, PWA assets, seven tables, and relationships found.'
+Write-Output 'PASS: repository structure, documentation, PWA assets, five tables, and relationships found.'
