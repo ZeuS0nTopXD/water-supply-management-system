@@ -5,67 +5,42 @@ using WaterSupply.Web.Models.AccountViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-public sealed class AccountController : Controller
+public sealed class AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) : Controller
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
-
-    public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
-    {
-        _signInManager = signInManager;
-        _userManager = userManager;
-    }
-
     [AllowAnonymous]
-    [HttpGet]
     public IActionResult Login(string? returnUrl = null) => View(new LoginViewModel { ReturnUrl = returnUrl });
 
-    [AllowAnonymous]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded)
-        {
-            var signedInUser = await _userManager.FindByEmailAsync(model.Email);
-            if (signedInUser is not null && await _userManager.IsInRoleAsync(signedInUser, "Resident")) return LocalRedirect(model.ReturnUrl ?? "/ResidentPortal");
-            return LocalRedirect(model.ReturnUrl ?? "/Dashboard");
-        }
-        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+
+        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded) return LocalRedirect(model.ReturnUrl ?? "/Dashboard");
+
+        ModelState.AddModelError(string.Empty, "Invalid email or password.");
         return View(model);
     }
 
-    [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, Authorize, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await signInManager.SignOutAsync();
         return RedirectToAction(nameof(Login));
     }
 
     [Authorize]
-    [HttpGet]
     public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
 
-    [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, Authorize, ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        var user = await _userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         if (user is null) return Challenge();
-        var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-        if (result.Succeeded)
-        {
-            await _signInManager.RefreshSignInAsync(user);
-            TempData["Message"] = "Password changed successfully.";
-            return RedirectToAction(nameof(ChangePassword));
-        }
 
+        var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (result.Succeeded) return RedirectToAction("Index", "Dashboard");
         foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
         return View(model);
     }

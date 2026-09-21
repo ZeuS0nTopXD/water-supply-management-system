@@ -33,9 +33,9 @@ GO
 IF NOT EXISTS (SELECT 1 FROM dbo.Bills WHERE BillId = 1)
 BEGIN
     SET IDENTITY_INSERT dbo.Bills ON;
-    INSERT INTO dbo.Bills (BillId, WaterConnectionId, BillingPeriodStart, BillingPeriodEnd, UnitsConsumed, RatePerUnit, FixedCharge, TaxAmount, PaidAmount, DueDate, Status)
-    VALUES (1, 1, '2026-09-01', '2026-09-30', 20, 5, 10, 2, 0, '2026-10-15', N'Unpaid'),
-           (2, 2, '2026-09-01', '2026-09-30', 25, 5, 10, 2, 0, '2026-10-15', N'Unpaid');
+    INSERT INTO dbo.Bills (BillId, WaterConnectionId, MeterReadingId, BillDate, UnitsConsumed, RatePerUnit, TotalAmount, DueDate, Status)
+    VALUES (1, 1, 1, '2026-09-30', 20, 5, 100, '2026-10-30', N'Unpaid'),
+           (2, 2, 2, '2026-09-30', 25, 5, 125, '2026-10-30', N'Unpaid');
     SET IDENTITY_INSERT dbo.Bills OFF;
 END
 GO

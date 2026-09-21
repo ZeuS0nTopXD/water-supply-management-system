@@ -1,3 +1,0 @@
-@model IEnumerable<Payment>
-@{ ViewData["Title"] = "Payments"; }
-<div class="d-flex justify-content-between align-items-center mb-3"><h1>Payments</h1><a asp-action="Create" class="btn btn-primary">Record payment</a></div><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Reference</th><th>Bill</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead><tbody>@foreach (var payment in Model) { <tr><td>@payment.ReferenceNumber</td><td>#@payment.BillId</td><td>@payment.Amount.ToString("C")</td><td>@payment.PaymentMethod</td><td>@payment.PaymentDate</td></tr> }</tbody></table></div>

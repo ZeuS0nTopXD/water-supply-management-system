@@ -1,3 +1,0 @@
-@model Bill
-@{ ViewData["Title"] = "Bill Details"; }
-<h1>Bill @Model.Id</h1><dl class="row"><dt class="col-sm-3">Billing period</dt><dd class="col-sm-9">@Model.BillingPeriodStart - @Model.BillingPeriodEnd</dd><dt class="col-sm-3">Total</dt><dd class="col-sm-9">@Model.TotalAmount.ToString("C")</dd><dt class="col-sm-3">Status</dt><dd class="col-sm-9">@Model.Status</dd></dl>

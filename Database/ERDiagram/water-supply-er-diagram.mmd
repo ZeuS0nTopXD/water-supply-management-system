@@ -2,10 +2,9 @@ erDiagram
     Residents ||--o{ WaterConnections : owns
     WaterConnections ||--o{ MeterReadings : has
     WaterConnections ||--o{ Bills : generates
-    Bills ||--o{ Payments : receives
+    MeterReadings ||--o{ Bills : supports
     Residents ||--o{ ServiceRequests : creates
     WaterConnections o|--o{ ServiceRequests : concerns
-    Residents ||--o{ Notifications : receives
 
     Residents {
         int ResidentId PK
@@ -37,20 +36,13 @@ erDiagram
     Bills {
         int BillId PK
         int WaterConnectionId FK
-        date BillingPeriodStart
-        date BillingPeriodEnd
+        int MeterReadingId FK
+        date BillDate
+        int UnitsConsumed
+        decimal RatePerUnit
         decimal TotalAmount
-        decimal PaidAmount
         date DueDate
         string Status
-    }
-    Payments {
-        int PaymentId PK
-        int BillId FK
-        datetime PaymentDate
-        decimal Amount
-        string PaymentMethod
-        string ReferenceNumber UK
     }
     ServiceRequests {
         int ServiceRequestId PK
@@ -60,13 +52,5 @@ erDiagram
         string Description
         datetime CreatedAt
         string Status
-    }
-    Notifications {
-        int NotificationId PK
-        int ResidentId FK
-        string Title
-        string Message
-        string NotificationType
-        datetime CreatedAt
-        datetime ReadAt
+        string StaffNotes
     }

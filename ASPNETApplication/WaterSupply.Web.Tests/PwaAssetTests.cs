@@ -28,4 +28,13 @@ public sealed class PwaAssetTests
         source.Should().Contain("addEventListener('fetch'");
         source.Should().Contain("offline");
     }
+
+    [Fact]
+    public void Layout_registers_notification_support()
+    {
+        var path = Path.Combine(WebRoot, "../Views/Shared/_Layout.cshtml");
+        File.ReadAllText(Path.GetFullPath(path)).Should().Contain("pwa-notifications.js");
+        var worker = File.ReadAllText(Path.Combine(WebRoot, "service-worker.js"));
+        worker.Should().Contain("notification");
+    }
 }

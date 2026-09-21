@@ -6,6 +6,5 @@ public sealed class DashboardSummaryViewModel
     public int ActiveConnectionCount { get; set; }
     public decimal CurrentMonthConsumption { get; set; }
     public decimal UnpaidBillAmount { get; set; }
-    public decimal CollectionAmount { get; set; }
     public int OpenServiceRequestCount { get; set; }
 }

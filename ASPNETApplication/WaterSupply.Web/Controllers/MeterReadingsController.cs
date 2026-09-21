@@ -2,61 +2,45 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WaterSupply.Domain.Entities;
-using WaterSupply.Domain.Exceptions;
 using WaterSupply.Web.Data;
 using WaterSupply.Web.Models.MeterReadingViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize(Roles = "Administrator")]
-public sealed class MeterReadingsController : Controller
+[Authorize]
+public sealed class MeterReadingsController(ApplicationDbContext context) : Controller
 {
-    private readonly ApplicationDbContext _context;
+    public async Task<IActionResult> Index() => View(await context.MeterReadings.AsNoTracking().OrderByDescending(reading => reading.ReadingDate).ToListAsync());
 
-    public MeterReadingsController(ApplicationDbContext context) => _context = context;
-
-    public async Task<IActionResult> Index(int? waterConnectionId, DateOnly? from, DateOnly? to)
-    {
-        var query = _context.MeterReadings.AsNoTracking();
-        if (waterConnectionId.HasValue) query = query.Where(reading => reading.WaterConnectionId == waterConnectionId.Value);
-        if (from.HasValue) query = query.Where(reading => reading.ReadingDate >= from.Value);
-        if (to.HasValue) query = query.Where(reading => reading.ReadingDate <= to.Value);
-        ViewBag.Connections = await _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
-        return View(await query.OrderByDescending(reading => reading.ReadingDate).ToListAsync());
-    }
-
-    [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadConnectionsAsync();
+        ViewBag.Connections = await context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
         return View(new MeterReadingEditViewModel());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MeterReadingEditViewModel model)
     {
-        if (await _context.MeterReadings.AnyAsync(reading => reading.WaterConnectionId == model.WaterConnectionId && reading.ReadingDate == model.ReadingDate))
-            ModelState.AddModelError(nameof(model.ReadingDate), "A reading already exists for this connection and date.");
         if (!ModelState.IsValid)
         {
-            await LoadConnectionsAsync();
+            ViewBag.Connections = await context.WaterConnections.AsNoTracking().ToListAsync();
             return View(model);
         }
 
+        var reading = new MeterReading(model.WaterConnectionId, model.ReadingDate);
         try
         {
-            _context.MeterReadings.Add(MeterReading.Create(model.WaterConnectionId, model.ReadingDate, model.PreviousReading, model.CurrentReading));
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            reading.RecordReading(model.PreviousReading, model.CurrentReading);
+            context.MeterReadings.Add(reading);
+            await context.SaveChangesAsync();
         }
-        catch (DomainValidationException exception)
+        catch (Exception exception) when (exception is InvalidOperationException || exception.GetType().Name.Contains("DomainValidation"))
         {
             ModelState.AddModelError(string.Empty, exception.Message);
-            await LoadConnectionsAsync();
+            ViewBag.Connections = await context.WaterConnections.AsNoTracking().ToListAsync();
             return View(model);
         }
-    }
 
-    private async Task LoadConnectionsAsync() => ViewBag.Connections = await _context.WaterConnections.AsNoTracking().OrderBy(connection => connection.ConnectionNumber).ToListAsync();
+        return RedirectToAction(nameof(Index));
+    }
 }

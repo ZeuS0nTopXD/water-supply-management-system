@@ -12,7 +12,7 @@ public static class DbInitializer
         using var scope = services.CreateScope();
         var provider = scope.ServiceProvider;
         var context = provider.GetRequiredService<ApplicationDbContext>();
-        await context.Database.MigrateAsync();
+        await context.Database.EnsureCreatedAsync();
 
         var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = provider.GetRequiredService<UserManager<IdentityUser>>();
@@ -24,14 +24,23 @@ public static class DbInitializer
 
         if (!await context.Residents.AnyAsync())
         {
-            var resident = new Resident(0, "Asha Patil", residentUser.Email!, "9876543210", "Main Road", new DateOnly(2026, 1, 1), residentUser.Id);
+            var resident = new Resident(0, "Asha Patil", residentUser.Email!, "9876543210", "Main Road", new DateOnly(2026, 1, 1), identityUserId: residentUser.Id);
             context.Residents.Add(resident);
             await context.SaveChangesAsync();
-            var connection = WaterConnection.Create(resident.Id, "WS-010", ConnectionType.Residential, "M-010", new DateOnly(2026, 1, 5));
+
+            var connection = new WaterConnection(resident.ResidentId, "WS-010", ConnectionType.Residential, "M-010", new DateOnly(2026, 1, 5));
             context.WaterConnections.Add(connection);
-            context.MeterReadings.Add(MeterReading.Create(connection.Id, new DateOnly(2026, 9, 1), 100, 120));
-            context.Bills.Add(Bill.Create(0, new DateOnly(2026, 9, 1), new DateOnly(2026, 9, 30), 20, 5, 10, 2, new DateOnly(2026, 10, 15), connection.Id));
-            context.ServiceRequests.Add(ServiceRequest.Create(resident.Id, connection.Id, ServiceRequestType.Leakage, "Leakage reported near the meter.", DateTime.UtcNow));
+            await context.SaveChangesAsync();
+
+            var reading = new MeterReading(connection.WaterConnectionId, new DateOnly(2026, 9, 1));
+            reading.RecordReading(100, 120);
+            context.MeterReadings.Add(reading);
+            await context.SaveChangesAsync();
+
+            var bill = new Bill(connection.WaterConnectionId, reading.MeterReadingId, new DateOnly(2026, 9, 30), (int)reading.Consumption, 5m);
+            bill.CalculateTotal();
+            context.Bills.Add(bill);
+            context.ServiceRequests.Add(new ServiceRequest(resident.ResidentId, connection.WaterConnectionId, RequestType.Leak, "Leak reported near the meter."));
             await context.SaveChangesAsync();
         }
 
@@ -43,7 +52,7 @@ public static class DbInitializer
         if (!await roleManager.RoleExistsAsync(role))
         {
             var result = await roleManager.CreateAsync(new IdentityRole(role));
-            if (!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(error => error.Description)));
+            EnsureSucceeded(result);
         }
     }
 
@@ -54,15 +63,23 @@ public static class DbInitializer
         {
             user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
             var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(error => error.Description)));
+            EnsureSucceeded(result);
         }
 
         if (!await userManager.IsInRoleAsync(user, role))
         {
             var result = await userManager.AddToRoleAsync(user, role);
-            if (!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(error => error.Description)));
+            EnsureSucceeded(result);
         }
 
         return user;
+    }
+
+    private static void EnsureSucceeded(IdentityResult result)
+    {
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException(string.Join("; ", result.Errors.Select(error => error.Description)));
+        }
     }
 }

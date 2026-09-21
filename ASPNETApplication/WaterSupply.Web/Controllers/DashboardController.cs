@@ -4,13 +4,13 @@ using WaterSupply.Web.Services;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize(Roles = "Administrator")]
-public sealed class DashboardController : Controller
+[Authorize]
+public sealed class DashboardController(DashboardQueryService dashboard) : Controller
 {
-    private readonly DashboardQueryService _dashboardQuery;
-
-    public DashboardController(DashboardQueryService dashboardQuery) => _dashboardQuery = dashboardQuery;
-
-    [HttpGet]
-    public async Task<IActionResult> Index() => View(await _dashboardQuery.GetSummaryAsync(DateOnly.FromDateTime(DateTime.Today)));
+    public async Task<IActionResult> Index(DateOnly? month = null)
+    {
+        var selectedMonth = month ?? DateOnly.FromDateTime(DateTime.Today);
+        ViewBag.SelectedMonth = selectedMonth;
+        return View(await dashboard.GetSummaryAsync(selectedMonth));
+    }
 }

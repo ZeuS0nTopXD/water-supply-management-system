@@ -11,6 +11,11 @@ const APP_SHELL = [
   '/icons/icon-512.svg'
 ];
 
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow('/Dashboard'));
+});
+
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
