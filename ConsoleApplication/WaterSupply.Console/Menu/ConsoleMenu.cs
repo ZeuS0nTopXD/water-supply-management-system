@@ -1,6 +1,7 @@
 using WaterSupply.Application.Abstractions;
 using WaterSupply.Domain.Enums;
 using WaterSupply.Domain.Exceptions;
+using WaterSupply.ConsoleApp.Seed;
 
 namespace WaterSupply.ConsoleApp.Menu;
 
@@ -8,23 +9,13 @@ public sealed class ConsoleMenu
 {
     private readonly InputReader _input;
     private readonly TextWriter _output;
-    private readonly IResidentService? _residents;
-    private readonly IWaterConnectionService? _connections;
-    private readonly IMeterReadingService? _readings;
-    private readonly IBillingService? _billing;
-    private readonly IServiceRequestService? _requests;
-    private readonly IReportService? _reports;
+    private readonly ConsoleMenuServices? _services;
 
-    public ConsoleMenu(InputReader input, TextWriter output, IResidentService? residents = null, IWaterConnectionService? connections = null, IMeterReadingService? readings = null, IBillingService? billing = null, IServiceRequestService? requests = null, IReportService? reports = null)
+    public ConsoleMenu(InputReader input, TextWriter output, ConsoleMenuServices? services = null)
     {
         _input = input;
         _output = output;
-        _residents = residents;
-        _connections = connections;
-        _readings = readings;
-        _billing = billing;
-        _requests = requests;
-        _reports = reports;
+        _services = services;
     }
 
     public void Run()
@@ -35,19 +26,18 @@ public sealed class ConsoleMenu
             PrintMainMenu();
             try
             {
-                var choice = _input.ReadInt("Choose an option: ", 0, 9);
+                var choice = _input.ReadInt("Choose an option: ", 0, 8);
                 running = choice switch
                 {
                     0 => false,
-                    1 => RunResidentMenu(),
-                    2 => RunConnectionMenu(),
-                    3 => RunReadingMenu(),
-                    4 => RunBillMenu(),
-                    5 => RunPaymentMenu(),
-                    6 => RunRequestMenu(),
-                    7 => RunSearch(),
-                    8 => RunReports(),
-                    9 => PrintHelp(),
+                    1 => AddResident(),
+                    2 => ListResidents(),
+                    3 => SearchResident(),
+                    4 => AddConnection(),
+                    5 => RecordReading(),
+                    6 => ViewBills(),
+                    7 => AddServiceRequest(),
+                    8 => ViewSummaryReport(),
                     _ => true
                 };
             }
@@ -59,10 +49,6 @@ public sealed class ConsoleMenu
             {
                 _output.WriteLine($"Record not found: {exception.Message}");
             }
-            catch (Exception exception) when (exception is FormatException or ArgumentException or InvalidOperationException)
-            {
-                _output.WriteLine($"Operation could not be completed: {exception.Message}");
-            }
         }
 
         _output.WriteLine("Goodbye.");
@@ -72,116 +58,105 @@ public sealed class ConsoleMenu
     {
         _output.WriteLine();
         _output.WriteLine("=== Water Supply Management System ===");
-        _output.WriteLine("1. Manage residents");
-        _output.WriteLine("2. Manage water connections");
-        _output.WriteLine("3. Record meter reading");
-        _output.WriteLine("4. Generate bill");
-        _output.WriteLine("5. Record payment");
-        _output.WriteLine("6. Service requests");
-        _output.WriteLine("7. Search records");
-        _output.WriteLine("8. Reports");
-        _output.WriteLine("9. Help");
+        _output.WriteLine("1. Add resident");
+        _output.WriteLine("2. List residents");
+        _output.WriteLine("3. Search resident");
+        _output.WriteLine("4. Add water connection");
+        _output.WriteLine("5. Record meter reading");
+        _output.WriteLine("6. View bills");
+        _output.WriteLine("7. Add service request");
+        _output.WriteLine("8. View summary report");
         _output.WriteLine("0. Exit");
     }
 
-    private bool RunResidentMenu()
+    private bool AddResident()
     {
-        var action = _input.ReadInt("1 Add resident, 2 Search residents, 3 Delete resident: ", 1, 3);
-        if (action == 1)
+        var resident = Services.Residents.Create(
+            _input.ReadRequiredString("Full name: "),
+            _input.ReadRequiredString("Email: "),
+            _input.ReadRequiredString("Phone: "),
+            _input.ReadRequiredString("Address: "),
+            _input.ReadDate("Registration date (yyyy-MM-dd): "));
+        _output.WriteLine($"Resident created with ID {resident.ResidentId}.");
+        return true;
+    }
+
+    private bool ListResidents()
+    {
+        foreach (var resident in Services.Residents.Search(null))
         {
-            var resident = Require(_residents).Create(_input.ReadRequiredString("Full name: "), _input.ReadRequiredString("Email: "), _input.ReadRequiredString("Phone: "), _input.ReadRequiredString("Address: "), _input.ReadDate("Registration date (yyyy-MM-dd): "));
-            _output.WriteLine($"Resident created with ID {resident.Id}.");
-        }
-        else if (action == 2)
-        {
-            foreach (var resident in Require(_residents).Search(_input.ReadRequiredString("Search name/email/phone: ")))
-                _output.WriteLine($"{resident.Id}: {resident.FullName} | {resident.Phone} | {resident.Email}");
-        }
-        else
-        {
-            Require(_residents).Delete(_input.ReadInt("Resident ID: ", 1, int.MaxValue));
-            _output.WriteLine("Resident deleted.");
+            _output.WriteLine($"{resident.ResidentId}: {resident.FullName} | {resident.Phone} | {resident.Email}");
         }
 
         return true;
     }
 
-    private bool RunConnectionMenu()
+    private bool SearchResident()
     {
-        var connection = Require(_connections).Create(_input.ReadInt("Resident ID: ", 1, int.MaxValue), _input.ReadRequiredString("Connection number: "), ConnectionType.Residential, _input.ReadRequiredString("Meter number: "), _input.ReadDate("Connection date (yyyy-MM-dd): "));
+        var search = _input.ReadRequiredString("Search name/email/phone: ");
+        foreach (var resident in Services.Residents.Search(search))
+        {
+            _output.WriteLine($"{resident.ResidentId}: {resident.FullName} | {resident.Phone} | {resident.Email}");
+        }
+
+        return true;
+    }
+
+    private bool AddConnection()
+    {
+        var connection = Services.Connections.Create(
+            _input.ReadInt("Resident ID: ", 1, int.MaxValue),
+            _input.ReadRequiredString("Connection number: "),
+            ConnectionType.Residential,
+            _input.ReadRequiredString("Meter number: "),
+            _input.ReadDate("Connection date (yyyy-MM-dd): "));
         _output.WriteLine($"Connection {connection.ConnectionNumber} created.");
         return true;
     }
 
-    private bool RunReadingMenu()
+    private bool RecordReading()
     {
-        var reading = Require(_readings).Record(_input.ReadInt("Connection ID: ", 1, int.MaxValue), _input.ReadDate("Reading date (yyyy-MM-dd): "), _input.ReadDecimal("Previous reading: "), _input.ReadDecimal("Current reading: "));
+        var connectionId = _input.ReadInt("Connection ID: ", 1, int.MaxValue);
+        var date = _input.ReadDate("Reading date (yyyy-MM-dd): ");
+        var reading = Services.Readings.Record(connectionId, date, _input.ReadDecimal("Previous reading: "), _input.ReadDecimal("Current reading: "));
+        var bill = Services.Billing.Generate(connectionId, reading.MeterReadingId, date, (int)reading.Consumption, 5m);
         _output.WriteLine($"Reading recorded. Consumption: {reading.Consumption:0.##} units.");
+        _output.WriteLine($"Bill {bill.BillId} generated. Total: {bill.TotalAmount:0.00}.");
         return true;
     }
 
-    private bool RunBillMenu()
+    private bool ViewBills()
     {
-        var bill = Require(_billing).GenerateBill(_input.ReadInt("Connection ID: ", 1, int.MaxValue), _input.ReadDate("Period start (yyyy-MM-dd): "), _input.ReadDate("Period end (yyyy-MM-dd): "), _input.ReadDecimal("Units consumed: "), _input.ReadDecimal("Rate per unit: "), _input.ReadDecimal("Fixed charge: "), _input.ReadDecimal("Tax: "), _input.ReadDate("Due date (yyyy-MM-dd): "));
-        _output.WriteLine($"Bill {bill.Id} generated. Total: {bill.TotalAmount:0.00}.");
-        return true;
-    }
-
-    private bool RunPaymentMenu()
-    {
-        var payment = Require(_billing).RecordPayment(_input.ReadInt("Bill ID: ", 1, int.MaxValue), _input.ReadDecimal("Amount: ", 0.01m), PaymentMethod.Cash, DateTime.Now);
-        _output.WriteLine($"Payment {payment.ReferenceNumber} recorded.");
-        return true;
-    }
-
-    private bool RunRequestMenu()
-    {
-        var request = Require(_requests).Create(_input.ReadInt("Resident ID: ", 1, int.MaxValue), null, ServiceRequestType.Other, _input.ReadRequiredString("Description: "));
-        _output.WriteLine($"Service request {request.Id} created.");
-        return true;
-    }
-
-    private bool RunSearch()
-    {
-        var query = _input.ReadRequiredString("Search residents or connections: ");
-        _output.WriteLine("Residents:");
-        foreach (var resident in Require(_residents).Search(query)) _output.WriteLine($"{resident.Id}: {resident.FullName}");
-        _output.WriteLine("Connections:");
-        foreach (var connection in Require(_connections).Search(query)) _output.WriteLine($"{connection.Id}: {connection.ConnectionNumber} ({connection.Status})");
-        return true;
-    }
-
-    private bool RunReports()
-    {
-        var reportType = _input.ReadInt("1 Outstanding bills, 2 Consumption, 3 Payments: ", 1, 3);
-        var reports = Require(_reports);
-        if (reportType == 1)
+        foreach (var bill in Services.Billing.GetAll())
         {
-            var report = reports.GetOutstandingBillsReport();
-            _output.WriteLine($"Outstanding total: {report.TotalOutstanding:0.00}");
-            foreach (var row in report.Rows) _output.WriteLine($"Bill {row.BillId} | Connection {row.WaterConnectionId} | {row.Status} | {row.OutstandingAmount:0.00}");
-        }
-        else if (reportType == 2)
-        {
-            var report = reports.GetConsumptionReport(_input.ReadDate("From (yyyy-MM-dd): "), _input.ReadDate("To (yyyy-MM-dd): "));
-            _output.WriteLine($"Total consumption: {report.TotalConsumption:0.##}");
-            foreach (var row in report.Rows) _output.WriteLine($"{row.ConnectionNumber}: {row.UnitsConsumed:0.##}");
-        }
-        else
-        {
-            var report = reports.GetPaymentCollectionReport(_input.ReadDate("From (yyyy-MM-dd): "), _input.ReadDate("To (yyyy-MM-dd): "));
-            _output.WriteLine($"Total collected: {report.TotalCollected:0.00}");
-            foreach (var row in report.Rows) _output.WriteLine($"Payment {row.PaymentId} / Bill {row.BillId}: {row.Amount:0.00}");
+            _output.WriteLine($"Bill {bill.BillId} | Connection {bill.WaterConnectionId} | {bill.Status} | {bill.TotalAmount:0.00}");
         }
 
         return true;
     }
 
-    private bool PrintHelp()
+    private bool AddServiceRequest()
     {
-        _output.WriteLine("Use the numbered menu to manage water-supply records, search data, and view reports.");
+        var request = Services.Requests.Create(
+            _input.ReadInt("Resident ID: ", 1, int.MaxValue),
+            null,
+            RequestType.Other,
+            _input.ReadRequiredString("Description: "));
+        _output.WriteLine($"Service request {request.ServiceRequestId} created.");
         return true;
     }
 
-    private static T Require<T>(T? service) where T : class => service ?? throw new InvalidOperationException("This menu action is not configured.");
+    private bool ViewSummaryReport()
+    {
+        var report = Services.Reports.GetSummary();
+        _output.WriteLine("Summary Report");
+        _output.WriteLine($"Residents: {report.Residents}");
+        _output.WriteLine($"Active connections: {report.ActiveConnections}");
+        _output.WriteLine($"Total consumption: {report.TotalConsumption:0.##}");
+        _output.WriteLine($"Total bill amount: {report.TotalBillAmount:0.00}");
+        _output.WriteLine($"Open requests: {report.OpenRequests}");
+        return true;
+    }
+
+    private ConsoleMenuServices Services => _services ?? throw new InvalidOperationException("Console services are not configured.");
 }

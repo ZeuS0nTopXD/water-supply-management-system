@@ -13,6 +13,13 @@ public class MenuSmokeTests
         menu.Run();
 
         Assert.Contains("Water Supply Management System", output.ToString());
+        Assert.Contains("Add resident", output.ToString());
+        Assert.Contains("Search resident", output.ToString());
+        Assert.Contains("Record meter reading", output.ToString());
+        Assert.Contains("View bills", output.ToString());
+        Assert.Contains("Add service request", output.ToString());
+        Assert.Contains("View summary report", output.ToString());
+        Assert.Contains("Exit", output.ToString());
         Assert.Contains("Goodbye", output.ToString());
     }
 }
