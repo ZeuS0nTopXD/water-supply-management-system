@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WaterSupply.Domain.Entities;
-using WaterSupply.Domain.Enums;
 
 namespace WaterSupply.Web.Data;
 
@@ -22,27 +20,7 @@ public static class DbInitializer
         var admin = await EnsureUserAsync(userManager, "admin@watersupply.local", "Admin@12345", "Administrator");
         var residentUser = await EnsureUserAsync(userManager, "resident@watersupply.local", "Resident@12345", "Resident");
 
-        if (!await context.Residents.AnyAsync())
-        {
-            var resident = new Resident(0, "Asha Patil", residentUser.Email!, "9876543210", "Main Road", new DateOnly(2026, 1, 1), identityUserId: residentUser.Id);
-            context.Residents.Add(resident);
-            await context.SaveChangesAsync();
-
-            var connection = new WaterConnection(resident.ResidentId, "WS-010", ConnectionType.Residential, "M-010", new DateOnly(2026, 1, 5));
-            context.WaterConnections.Add(connection);
-            await context.SaveChangesAsync();
-
-            var reading = new MeterReading(connection.WaterConnectionId, new DateOnly(2026, 9, 1));
-            reading.RecordReading(100, 120);
-            context.MeterReadings.Add(reading);
-            await context.SaveChangesAsync();
-
-            var bill = new Bill(connection.WaterConnectionId, reading.MeterReadingId, new DateOnly(2026, 9, 30), (int)reading.Consumption, 5m);
-            bill.CalculateTotal();
-            context.Bills.Add(bill);
-            context.ServiceRequests.Add(new ServiceRequest(resident.ResidentId, connection.WaterConnectionId, RequestType.Leak, "Leak reported near the meter."));
-            await context.SaveChangesAsync();
-        }
+        await DemoDataSeeder.SeedAsync(context, residentUser.Id);
 
         _ = admin;
     }

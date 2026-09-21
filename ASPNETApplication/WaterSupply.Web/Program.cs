@@ -59,7 +59,12 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-if (!app.Environment.IsEnvironment("Testing"))
+var seedPreviewData = string.Equals(
+    Environment.GetEnvironmentVariable("WATER_SUPPLY_DEMO_DATA"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
+
+if (!app.Environment.IsEnvironment("Testing") || seedPreviewData)
 {
     await DbInitializer.InitializeAsync(app.Services);
 }

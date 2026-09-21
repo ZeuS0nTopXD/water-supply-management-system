@@ -48,6 +48,16 @@ dotnet run --project ASPNETApplication/WaterSupply.Web
 
 The development initializer creates `admin@watersupply.local` / `Admin@12345` and `resident@watersupply.local` / `Resident@12345`. Change these before real deployment. Open the site on a mobile browser and use the browser install action to install the PWA.
 
+For a presentation preview without SQL Server, run the app in Testing mode with demo data enabled:
+
+```powershell
+$env:ASPNETCORE_ENVIRONMENT = "Testing"
+$env:WATER_SUPPLY_DEMO_DATA = "true"
+dotnet run --project ASPNETApplication/WaterSupply.Web --urls http://127.0.0.1:5077
+```
+
+This preview includes four residents, four connections, current-month meter readings, bills, and service requests. Use `admin@watersupply.local` / `Admin@12345` to open the dashboard.
+
 ## Test and build
 
 ```powershell
