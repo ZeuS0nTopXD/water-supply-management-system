@@ -58,6 +58,10 @@ dotnet run --project ASPNETApplication/WaterSupply.Web --urls http://127.0.0.1:5
 
 This preview includes four residents, four connections, current-month meter readings, bills, and service requests. Use `admin@watersupply.local` / `Admin@12345` to open the dashboard.
 
+### Deploy the presentation preview to Vercel
+
+The repository includes `Dockerfile.vercel` and `vercel.json` for Vercel's container runtime. The Vercel deployment runs the seeded presentation preview with in-memory data; it is intended for demonstration, not durable production records. Connect this repository to Vercel or run `vercel deploy --prod` from the repository root after authenticating with Vercel.
+
 ## Test and build
 
 ```powershell

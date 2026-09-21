@@ -1,0 +1,11 @@
+.git
+.gitignore
+.superpowers
+**/bin
+**/obj
+SQLEXPR_x64_ENU
+docs
+Documentation
+PWA
+*.user
+*.suo
