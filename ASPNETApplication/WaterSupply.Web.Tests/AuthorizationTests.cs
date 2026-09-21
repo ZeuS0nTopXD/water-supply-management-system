@@ -33,6 +33,20 @@ public sealed class AuthorizationTests
     }
 
     [Fact]
+    public async Task Registration_page_uses_readable_field_labels()
+    {
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/Account/Register");
+        var html = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        html.Should().Contain("for=\"FullName\">Full name</label>");
+        html.Should().Contain("for=\"ConfirmPassword\">Confirm password</label>");
+    }
+
+    [Fact]
     public async Task Registration_creates_account_and_resident_record()
     {
         using var factory = new TestWebApplicationFactory();
