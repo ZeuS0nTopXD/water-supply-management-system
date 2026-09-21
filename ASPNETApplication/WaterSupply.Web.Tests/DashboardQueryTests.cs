@@ -36,5 +36,9 @@ public sealed class DashboardQueryTests
         summary.CurrentMonthConsumption.Should().Be(20);
         summary.UnpaidBillAmount.Should().Be(100);
         summary.OpenServiceRequestCount.Should().Be(1);
+        summary.InProgressServiceRequestCount.Should().Be(0);
+        summary.ClosedServiceRequestCount.Should().Be(0);
+        summary.SelectedMonth.Should().Be(new DateOnly(2026, 9, 1));
+        summary.RecentRequests.Should().ContainSingle(request => request.Description == "Leak");
     }
 }

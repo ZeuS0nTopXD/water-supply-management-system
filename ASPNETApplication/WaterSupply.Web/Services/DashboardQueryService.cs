@@ -14,6 +14,7 @@ public sealed class DashboardQueryService(ApplicationDbContext context)
 
         return new DashboardSummaryViewModel
         {
+            SelectedMonth = firstDay,
             ResidentCount = await context.Residents.CountAsync(),
             ActiveConnectionCount = await context.WaterConnections.CountAsync(connection => connection.Status == ConnectionStatus.Active),
             CurrentMonthConsumption = await context.MeterReadings
@@ -25,7 +26,24 @@ public sealed class DashboardQueryService(ApplicationDbContext context)
                 .Select(bill => (decimal?)bill.TotalAmount)
                 .SumAsync() ?? 0,
             OpenServiceRequestCount = await context.ServiceRequests
-                .CountAsync(request => request.Status != RequestStatus.Closed)
+                .CountAsync(request => request.Status != RequestStatus.Closed),
+            InProgressServiceRequestCount = await context.ServiceRequests
+                .CountAsync(request => request.Status == RequestStatus.InProgress),
+            ClosedServiceRequestCount = await context.ServiceRequests
+                .CountAsync(request => request.Status == RequestStatus.Closed),
+            RecentRequests = await context.ServiceRequests
+                .AsNoTracking()
+                .OrderByDescending(request => request.CreatedAt)
+                .Take(5)
+                .Select(request => new DashboardRequestViewModel
+                {
+                    ServiceRequestId = request.ServiceRequestId,
+                    RequestType = request.RequestType,
+                    Description = request.Description,
+                    CreatedAt = request.CreatedAt,
+                    Status = request.Status
+                })
+                .ToListAsync()
         };
     }
 }
