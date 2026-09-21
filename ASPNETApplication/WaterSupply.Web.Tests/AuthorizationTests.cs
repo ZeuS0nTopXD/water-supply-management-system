@@ -16,4 +16,16 @@ public sealed class AuthorizationTests
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location!.AbsolutePath.Should().Contain("/Account/Login");
     }
+
+    [Fact]
+    public async Task Login_page_loads_successfully()
+    {
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/Account/Login");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await response.Content.ReadAsStringAsync()).Should().Contain("<h1>Login</h1>");
+    }
 }

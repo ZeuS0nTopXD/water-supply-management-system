@@ -10,7 +10,7 @@ namespace WaterSupply.Web.Tests;
 public sealed class DashboardQueryTests
 {
     [Fact]
-    public async Task Dashboard_summary_aggregates_basic_business_metrics()
+    public async Task Dashboard_summary_aggregates_business_metrics()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase($"dashboard-{Guid.NewGuid():N}").Options;
         await using var db = new ApplicationDbContext(options);

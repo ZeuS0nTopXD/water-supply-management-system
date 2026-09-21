@@ -1,6 +1,6 @@
 # Water Supply Management System
 
-A deliberately basic three-phase .NET project for learning OOP, ASP.NET Core MVC, SQL Server, and Progressive Web Applications.
+A three-phase .NET project for learning OOP, ASP.NET Core MVC, SQL Server, and Progressive Web Applications.
 
 ## Repository structure
 
@@ -15,7 +15,7 @@ WaterSupplyManagementSystem/
 └── README.md
 ```
 
-## Basic scope
+## Project scope
 
 The project manages five business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. It intentionally excludes payments, notifications as a business table, resident portals, and advanced workflows so the project remains easy to understand.
 

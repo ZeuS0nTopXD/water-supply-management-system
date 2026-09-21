@@ -31,7 +31,7 @@ The Water Supply Management System gives utility staff a simple application for 
 
 ## 5. Out of scope
 
-Payments, payment gateways, a separate resident portal, a notifications business table, SMS/email delivery, and advanced approval workflows are intentionally excluded from this basic academic version.
+Payments, payment gateways, a separate resident portal, a notifications business table, SMS/email delivery, and advanced approval workflows are intentionally excluded from this academic version.
 
 ## 6. Non-functional requirements
 
