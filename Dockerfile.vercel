@@ -13,15 +13,13 @@ RUN dotnet publish "ASPNETApplication/WaterSupply.Web/WaterSupply.Web.csproj" \
     --output /app/publish \
     /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-ENV PORT=8080 \
-    ASPNETCORE_HTTP_PORTS=8080 \
-    ASPNETCORE_ENVIRONMENT=Testing \
+ENV ASPNETCORE_ENVIRONMENT=Testing \
     WATER_SUPPLY_DEMO_DATA=true \
     DOTNET_EnableDiagnostics=0
 
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "WaterSupply.Web.dll"]
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://0.0.0.0:${PORT:-8080} exec dotnet WaterSupply.Web.dll"]
