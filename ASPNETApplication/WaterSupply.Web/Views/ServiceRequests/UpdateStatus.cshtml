@@ -1,0 +1,9 @@
+@model ServiceRequestStatusViewModel
+@{ ViewData["Title"] = "Update Request"; }
+<h1>Update request</h1>
+<form method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<RequestStatus>()" class="form-select mb-3"></select>
+    <label asp-for="StaffNotes" class="form-label"></label><textarea asp-for="StaffNotes" class="form-control mb-3"></textarea>
+    <button class="btn btn-primary">Save status</button> <a asp-action="Index" class="btn btn-link">Cancel</a>
+</form>

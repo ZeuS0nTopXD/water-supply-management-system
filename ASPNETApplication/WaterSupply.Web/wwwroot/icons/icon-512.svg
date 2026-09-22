@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Water Supply Management">
+  <rect width="512" height="512" rx="108" fill="#0f766e"/>
+  <path d="M256 75c-48 70-115 133-115 221a115 115 0 0 0 230 0c0-88-67-151-115-221Z" fill="#d9f99d"/>
+  <path d="M191 315c11 37 38 59 75 59" fill="none" stroke="#0f766e" stroke-linecap="round" stroke-width="22"/>
+</svg>

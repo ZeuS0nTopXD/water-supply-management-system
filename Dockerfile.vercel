@@ -1,0 +1,30 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["ASPNETApplication/WaterSupply.Web/WaterSupply.Web.csproj", "ASPNETApplication/WaterSupply.Web/"]
+COPY ["Shared/WaterSupply.Domain/WaterSupply.Domain.csproj", "Shared/WaterSupply.Domain/"]
+COPY ["Shared/WaterSupply.Application/WaterSupply.Application.csproj", "Shared/WaterSupply.Application/"]
+
+RUN dotnet restore "ASPNETApplication/WaterSupply.Web/WaterSupply.Web.csproj"
+
+COPY . .
+
+RUN dotnet publish "ASPNETApplication/WaterSupply.Web/WaterSupply.Web.csproj" \
+    --configuration Release \
+    --no-restore \
+    --output /app/publish \
+    /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime
+
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    WATER_SUPPLY_DEMO_DATA=true \
+    DOTNET_EnableDiagnostics=0
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://0.0.0.0:${PORT:-8080} exec dotnet WaterSupply.Web.dll"]

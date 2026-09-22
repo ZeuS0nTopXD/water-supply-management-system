@@ -1,0 +1,56 @@
+erDiagram
+    Residents ||--o{ WaterConnections : owns
+    WaterConnections ||--o{ MeterReadings : has
+    WaterConnections ||--o{ Bills : generates
+    MeterReadings ||--o{ Bills : supports
+    Residents ||--o{ ServiceRequests : creates
+    WaterConnections o|--o{ ServiceRequests : concerns
+
+    Residents {
+        int ResidentId PK
+        string IdentityUserId UK
+        string FullName
+        string Email
+        string Phone
+        string Address
+        date RegistrationDate
+        bool IsActive
+    }
+    WaterConnections {
+        int WaterConnectionId PK
+        int ResidentId FK
+        string ConnectionNumber UK
+        string ConnectionType
+        string MeterNumber
+        date ConnectionDate
+        string Status
+    }
+    MeterReadings {
+        int MeterReadingId PK
+        int WaterConnectionId FK
+        date ReadingDate
+        decimal PreviousReading
+        decimal CurrentReading
+        decimal Consumption
+    }
+    Bills {
+        int BillId PK
+        int WaterConnectionId FK
+        int MeterReadingId FK
+        date BillDate
+        int UnitsConsumed
+        decimal RatePerUnit
+        decimal TotalAmount
+        date DueDate
+        string Status
+    }
+    ServiceRequests {
+        int ServiceRequestId PK
+        int ResidentId FK
+        int WaterConnectionId FK
+        string RequestType
+        string Description
+        datetime CreatedAt
+        string Status
+        string StaffNotes
+    }

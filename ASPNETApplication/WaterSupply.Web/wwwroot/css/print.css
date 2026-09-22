@@ -1,0 +1,6 @@
+@media print {
+    .no-print, nav, footer, form { display: none !important; }
+    body { font-size: 11pt; color: #000; background: #fff; }
+    .container { max-width: none; }
+    .table { border-color: #000; }
+}

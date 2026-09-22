@@ -1,0 +1,12 @@
+@model ConnectionEditViewModel
+@{ ViewData["Title"] = "Add Connection"; var residents = ViewBag.Residents as IEnumerable<Resident> ?? []; }
+<h1>Add water connection</h1>
+<form asp-action="Create" method="post" class="row g-3 col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6"><label asp-for="ResidentId" class="form-label"></label><select asp-for="ResidentId" class="form-select"><option value="">Select resident</option>@foreach (var resident in residents) { <option value="@resident.ResidentId">@resident.FullName</option> }</select></div>
+    <div class="col-md-6"><label asp-for="ConnectionNumber" class="form-label"></label><input asp-for="ConnectionNumber" class="form-control" /></div>
+    <div class="col-md-6"><label asp-for="ConnectionType" class="form-label"></label><select asp-for="ConnectionType" asp-items="Html.GetEnumSelectList<ConnectionType>()" class="form-select"></select></div>
+    <div class="col-md-6"><label asp-for="MeterNumber" class="form-label"></label><input asp-for="MeterNumber" class="form-control" /></div>
+    <div class="col-md-6"><label asp-for="ConnectionDate" class="form-label"></label><input asp-for="ConnectionDate" class="form-control" /></div>
+    <div class="col-12"><button class="btn btn-primary">Save</button> <a asp-action="Index" class="btn btn-link">Cancel</a></div>
+</form>
