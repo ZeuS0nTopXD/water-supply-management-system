@@ -30,6 +30,15 @@ public sealed class PwaAssetTests
     }
 
     [Fact]
+    public void Service_worker_does_not_cache_failed_http_responses()
+    {
+        var path = Path.Combine(WebRoot, "service-worker.js");
+        var source = File.ReadAllText(path);
+
+        source.Should().Contain("response.ok");
+    }
+
+    [Fact]
     public void Layout_registers_notification_support()
     {
         var path = Path.Combine(WebRoot, "../Views/Shared/_Layout.cshtml");

@@ -79,7 +79,13 @@ public sealed class AccountController(
         if (!ModelState.IsValid) return View(model);
 
         var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded) return LocalRedirect(model.ReturnUrl ?? "/Dashboard");
+        if (result.Succeeded)
+        {
+            var destination = model.ReturnUrl is not null && Url.IsLocalUrl(model.ReturnUrl)
+                ? model.ReturnUrl
+                : "/Dashboard";
+            return LocalRedirect(destination);
+        }
 
         ModelState.AddModelError(string.Empty, "Invalid email or password.");
         return View(model);

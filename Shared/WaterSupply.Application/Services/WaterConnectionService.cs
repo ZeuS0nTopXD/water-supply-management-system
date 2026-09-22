@@ -14,6 +14,11 @@ public sealed class WaterConnectionService : IWaterConnectionService
 
     public WaterConnection Create(int residentId, string connectionNumber, ConnectionType type, string meterNumber, DateOnly connectionDate)
     {
+        if (!_store.Residents.Any(resident => resident.ResidentId == residentId))
+        {
+            throw new DomainValidationException("A valid resident is required.");
+        }
+
         if (_store.Connections.Any(connection => connection.ConnectionNumber.Equals(connectionNumber.Trim(), StringComparison.OrdinalIgnoreCase)))
         {
             throw new DomainValidationException("Connection number must be unique.");

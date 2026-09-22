@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WaterSupply.Domain.Enums;
 
 public enum ConnectionType
@@ -21,6 +23,7 @@ public enum BillStatus
 public enum RequestType
 {
     Leak,
+    [Display(Name = "No supply")]
     NoSupply,
     Other
 }
@@ -28,6 +31,7 @@ public enum RequestType
 public enum RequestStatus
 {
     Open,
+    [Display(Name = "In progress")]
     InProgress,
     Closed
 }

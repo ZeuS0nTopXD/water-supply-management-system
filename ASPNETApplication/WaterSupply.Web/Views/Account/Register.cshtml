@@ -4,14 +4,15 @@
     <h1>Create account</h1>
     <p class="text-muted">Register as a resident to access the water supply dashboard.</p>
     <form asp-action="Register" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control mb-3" />
-        <label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control mb-3" />
-        <label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control mb-3" />
-        <label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control mb-3" />
-        <label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control mb-3" />
-        <label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control mb-3" />
-        <button class="btn btn-primary">Register</button>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" autocomplete="name" placeholder="e.g. Asha Patil" /><span asp-validation-for="FullName" class="text-danger small"></span>
+        <label asp-for="Email" class="form-label mt-3"></label><input asp-for="Email" class="form-control" autocomplete="email" placeholder="you@example.com" /><span asp-validation-for="Email" class="text-danger small"></span>
+        <label asp-for="Phone" class="form-label mt-3"></label><input asp-for="Phone" class="form-control" autocomplete="tel" placeholder="10-digit phone number" /><span asp-validation-for="Phone" class="text-danger small"></span>
+        <label asp-for="Address" class="form-label mt-3"></label><input asp-for="Address" class="form-control" autocomplete="street-address" placeholder="Street and locality" /><span asp-validation-for="Address" class="text-danger small"></span>
+        <label asp-for="Password" class="form-label mt-3"></label><input asp-for="Password" class="form-control" autocomplete="new-password" placeholder="At least 6 characters" /><span asp-validation-for="Password" class="text-danger small"></span>
+        <label asp-for="ConfirmPassword" class="form-label mt-3"></label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Re-enter your password" /><span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+        <div class="d-flex flex-wrap gap-2 mt-4"><button class="btn btn-primary" type="submit">Register</button>
         <a class="btn btn-link" asp-action="Login">Already have an account?</a>
+        </div>
     </form>
 </div></div>

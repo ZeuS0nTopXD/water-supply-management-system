@@ -1,4 +1,11 @@
 @model IEnumerable<MeterReading>
 @{ ViewData["Title"] = "Meter Readings"; }
 <div class="d-flex justify-content-between align-items-center mb-3"><h1>Meter readings</h1><a class="btn btn-primary" asp-action="Create">Record reading</a></div>
-<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Connection</th><th>Date</th><th>Previous</th><th>Current</th><th>Consumption</th></tr></thead><tbody>@foreach (var reading in Model) { <tr><td>@reading.WaterConnectionId</td><td>@reading.ReadingDate</td><td>@reading.PreviousReading</td><td>@reading.CurrentReading</td><td>@reading.Consumption</td></tr> }</tbody></table></div>
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">No meter readings have been recorded yet.</div>
+}
+else
+{
+<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Connection ID</th><th>Reading date</th><th>Previous reading</th><th>Current reading</th><th>Consumption</th></tr></thead><tbody>@foreach (var reading in Model) { <tr><td>@reading.WaterConnectionId</td><td>@reading.ReadingDate</td><td>@reading.PreviousReading</td><td>@reading.CurrentReading</td><td>@reading.Consumption</td></tr> }</tbody></table></div>
+}

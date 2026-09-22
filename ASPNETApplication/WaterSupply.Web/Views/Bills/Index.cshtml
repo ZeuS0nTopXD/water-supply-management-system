@@ -1,5 +1,12 @@
 @model IEnumerable<Bill>
-@{ ViewData["Title"] = "Bills"; }
+@{ ViewData["Title"] = "Bills"; var selectedStatus = ViewBag.Status as BillStatus?; }
 <div class="d-flex justify-content-between align-items-center mb-3"><h1>Bills</h1><a class="btn btn-primary" asp-action="Create">Add bill</a></div>
-<form method="get" class="row g-2 mb-3"><div class="col-sm-8"><select name="status" class="form-select"><option value="">All statuses</option><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option></select></div><div class="col-sm-4"><button class="btn btn-outline-secondary">Filter</button></div></form>
-<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Bill</th><th>Connection</th><th>Date</th><th>Total</th><th>Due</th><th>Status</th></tr></thead><tbody>@foreach (var bill in Model) { <tr><td>#@bill.BillId</td><td>@bill.WaterConnectionId</td><td>@bill.BillDate</td><td>@bill.TotalAmount.ToString("C")</td><td>@bill.DueDate</td><td>@bill.Status</td></tr> }</tbody></table></div>
+<form method="get" class="row g-2 mb-3"><div class="col-sm-8"><label class="visually-hidden" for="bill-status">Filter bills by status</label><select id="bill-status" name="status" class="form-select"><option value="">All statuses</option><option value="Unpaid" selected="@(selectedStatus == BillStatus.Unpaid ? "selected" : null)">Unpaid</option><option value="Paid" selected="@(selectedStatus == BillStatus.Paid ? "selected" : null)">Paid</option></select></div><div class="col-sm-4"><button class="btn btn-outline-secondary w-100" type="submit">Filter bills</button></div></form>
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">No bills match the selected filter.</div>
+}
+else
+{
+<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Bill</th><th>Connection ID</th><th>Bill date</th><th>Total amount</th><th>Due date</th><th>Status</th></tr></thead><tbody>@foreach (var bill in Model) { <tr><td>#@bill.BillId</td><td>@bill.WaterConnectionId</td><td>@bill.BillDate</td><td>@bill.TotalAmount.ToString("C")</td><td>@bill.DueDate</td><td>@bill.Status</td></tr> }</tbody></table></div>
+}

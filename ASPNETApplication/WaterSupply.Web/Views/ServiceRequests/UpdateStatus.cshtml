@@ -2,8 +2,8 @@
 @{ ViewData["Title"] = "Update Request"; }
 <h1>Update request</h1>
 <form method="post" class="col-lg-8">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<RequestStatus>()" class="form-select mb-3"></select>
-    <label asp-for="StaffNotes" class="form-label"></label><textarea asp-for="StaffNotes" class="form-control mb-3"></textarea>
-    <button class="btn btn-primary">Save status</button> <a asp-action="Index" class="btn btn-link">Cancel</a>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<RequestStatus>()" class="form-select"></select><span asp-validation-for="Status" class="text-danger small d-block"></span>
+    <label asp-for="StaffNotes" class="form-label mt-3"></label><textarea asp-for="StaffNotes" class="form-control" rows="4" placeholder="Optional notes for the resident or staff"></textarea><span asp-validation-for="StaffNotes" class="text-danger small"></span>
+    <button class="btn btn-primary mt-4" type="submit">Save status</button> <a asp-action="Index" class="btn btn-link">Cancel</a>
 </form>

@@ -17,7 +17,9 @@ public class DatabaseMappingTests
 
         var businessTables = db.Model.GetEntityTypes()
             .Select(entity => entity.GetTableName())
-            .Where(table => table is not null && !table.StartsWith("AspNet", StringComparison.Ordinal))
+            .Where(table => table is not null
+                && !table.StartsWith("AspNet", StringComparison.Ordinal)
+                && !string.Equals(table, "DataProtectionKey", StringComparison.Ordinal))
             .Distinct()
             .ToArray();
 

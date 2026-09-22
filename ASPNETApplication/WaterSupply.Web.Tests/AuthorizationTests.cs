@@ -1,5 +1,6 @@
 using System.Net;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WaterSupply.Web.Data;
@@ -30,6 +31,18 @@ public sealed class AuthorizationTests
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         (await response.Content.ReadAsStringAsync()).Should().Contain("<h1>Login</h1>");
+    }
+
+    [Fact]
+    public async Task Error_page_is_available_for_production_exception_handling()
+    {
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/Home/Error");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await response.Content.ReadAsStringAsync()).Should().Contain("Something went wrong");
     }
 
     [Fact]
@@ -76,5 +89,38 @@ public sealed class AuthorizationTests
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         (await db.Users.CountAsync(user => user.Email == "new.resident@example.com")).Should().Be(1);
         (await db.Residents.CountAsync(resident => resident.Email == "new.resident@example.com")).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Login_with_external_return_url_stays_inside_the_application()
+    {
+        using var factory = new TestWebApplicationFactory();
+        using (var scope = factory.Services.CreateScope())
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var user = new IdentityUser
+            {
+                UserName = "login.test@example.com",
+                Email = "login.test@example.com",
+                EmailConfirmed = true
+            };
+            (await userManager.CreateAsync(user, "Resident123")).Succeeded.Should().BeTrue();
+        }
+
+        using var client = factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var loginPage = await client.GetAsync("/Account/Login");
+        var html = await loginPage.Content.ReadAsStringAsync();
+        var token = System.Text.RegularExpressions.Regex.Match(html, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
+
+        var response = await client.PostAsync("/Account/Login", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = token,
+            ["Email"] = "login.test@example.com",
+            ["Password"] = "Resident123",
+            ["ReturnUrl"] = "https://example.com/not-local"
+        }));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.Headers.Location!.ToString().Should().Be("/Dashboard");
     }
 }

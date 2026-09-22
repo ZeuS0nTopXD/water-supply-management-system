@@ -35,8 +35,7 @@ public sealed class ServiceRequestsController(ApplicationDbContext context) : Co
 
     public async Task<IActionResult> Create()
     {
-        ViewBag.Residents = await context.Residents.AsNoTracking().ToListAsync();
-        ViewBag.Connections = await context.WaterConnections.AsNoTracking().ToListAsync();
+        await LoadCreateOptionsAsync();
         return View(new ServiceRequestCreateViewModel());
     }
 
@@ -45,13 +44,48 @@ public sealed class ServiceRequestsController(ApplicationDbContext context) : Co
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Residents = await context.Residents.AsNoTracking().ToListAsync();
-            ViewBag.Connections = await context.WaterConnections.AsNoTracking().ToListAsync();
+            await LoadCreateOptionsAsync();
+            return View(model);
+        }
+
+        if (!await context.Residents.AnyAsync(resident => resident.ResidentId == model.ResidentId))
+        {
+            ModelState.AddModelError(nameof(model.ResidentId), "Select a valid resident.");
+        }
+
+        if (model.WaterConnectionId is not null)
+        {
+            var connection = await context.WaterConnections
+                .AsNoTracking()
+                .SingleOrDefaultAsync(item => item.WaterConnectionId == model.WaterConnectionId);
+            if (connection is null)
+            {
+                ModelState.AddModelError(nameof(model.WaterConnectionId), "Select a valid water connection.");
+            }
+            else if (connection.ResidentId != model.ResidentId)
+            {
+                ModelState.AddModelError(nameof(model.WaterConnectionId), "The connection must belong to the selected resident.");
+            }
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await LoadCreateOptionsAsync();
             return View(model);
         }
 
         context.ServiceRequests.Add(new ServiceRequest(model.ResidentId, model.WaterConnectionId, model.RequestType, model.Description));
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(string.Empty, "The request could not be saved. Check that the selected records are still available.");
+            await LoadCreateOptionsAsync();
+            return View(model);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -64,10 +98,23 @@ public sealed class ServiceRequestsController(ApplicationDbContext context) : Co
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateStatus(int id, ServiceRequestStatusViewModel model)
     {
+        if (!ModelState.IsValid) return View(model);
         var request = await context.ServiceRequests.FindAsync(id);
         if (request is null) return NotFound();
         request.ChangeStatus(model.Status, model.StaffNotes);
         await context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task LoadCreateOptionsAsync()
+    {
+        ViewBag.Residents = await context.Residents
+            .AsNoTracking()
+            .OrderBy(resident => resident.FullName)
+            .ToListAsync();
+        ViewBag.Connections = await context.WaterConnections
+            .AsNoTracking()
+            .OrderBy(connection => connection.ConnectionNumber)
+            .ToListAsync();
     }
 }

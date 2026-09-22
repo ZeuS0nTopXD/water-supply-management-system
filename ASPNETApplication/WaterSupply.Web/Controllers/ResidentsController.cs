@@ -10,11 +10,12 @@ namespace WaterSupply.Web.Controllers;
 [Authorize]
 public sealed class ResidentsController(ApplicationDbContext context) : Controller
 {
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index(string? search, string? error)
     {
         var query = context.Residents.AsNoTracking().OrderBy(resident => resident.FullName).AsQueryable();
         if (!string.IsNullOrWhiteSpace(search)) query = query.Where(resident => resident.FullName.Contains(search) || resident.Email.Contains(search));
         ViewBag.Search = search;
+        ViewBag.Error = error;
         return View(await query.ToListAsync());
     }
 
@@ -59,6 +60,17 @@ public sealed class ResidentsController(ApplicationDbContext context) : Controll
     {
         var resident = await context.Residents.FindAsync(id);
         if (resident is null) return NotFound();
+
+        var hasConnections = await context.WaterConnections.AnyAsync(connection => connection.ResidentId == id);
+        var hasRequests = await context.ServiceRequests.AnyAsync(request => request.ResidentId == id);
+        if (hasConnections || hasRequests)
+        {
+            return RedirectToAction(nameof(Index), new
+            {
+                error = "Remove related connections and requests before deleting this resident."
+            });
+        }
+
         context.Residents.Remove(resident);
         await context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));

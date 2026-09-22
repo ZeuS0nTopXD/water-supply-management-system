@@ -11,9 +11,9 @@
 </head>
 <body>
 <header class="border-bottom bg-white">
-    <nav class="navbar navbar-expand-lg container">
+    <nav class="navbar navbar-expand-lg container" aria-label="Primary navigation">
         <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">Water Supply</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">Menu</button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">Menu</button>
         <div id="mainNav" class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto">
                 @if (User.Identity?.IsAuthenticated == true)
@@ -41,7 +41,7 @@
         </div>
     </nav>
 </header>
-<main class="container py-4">@RenderBody()</main>
+<main id="main-content" class="container py-4">@RenderBody()</main>
 <footer class="container border-top py-3 text-muted small">Water Supply Management System</footer>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js"></script>

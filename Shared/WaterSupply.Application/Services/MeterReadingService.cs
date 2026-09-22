@@ -13,6 +13,11 @@ public sealed class MeterReadingService : IMeterReadingService
 
     public MeterReading Record(int connectionId, DateOnly date, decimal previousReading, decimal currentReading)
     {
+        if (!_store.Connections.Any(connection => connection.WaterConnectionId == connectionId))
+        {
+            throw new DomainValidationException("A valid water connection is required.");
+        }
+
         if (_store.Readings.Any(reading => reading.WaterConnectionId == connectionId && reading.ReadingDate == date))
         {
             throw new DomainValidationException("A reading already exists for this connection and date.");
