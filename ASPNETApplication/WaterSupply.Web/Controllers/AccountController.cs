@@ -73,7 +73,7 @@ public sealed class AccountController(
         return RedirectToAction("Index", "Dashboard");
     }
 
-    [HttpPost, AllowAnonymous]
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
