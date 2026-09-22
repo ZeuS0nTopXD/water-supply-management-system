@@ -7,6 +7,7 @@ public sealed class ServiceRequestListItemViewModel
     public int ServiceRequestId { get; init; }
     public int ResidentId { get; init; }
     public string ResidentName { get; init; } = string.Empty;
+    public string? ConnectionNumber { get; init; }
     public RequestType RequestType { get; init; }
     public string Description { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }

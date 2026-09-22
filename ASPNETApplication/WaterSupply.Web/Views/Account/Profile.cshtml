@@ -1,0 +1,12 @@
+@model ResidentProfileViewModel
+@{ ViewData["Title"] = "My Profile"; }
+<h1>My profile</h1>
+<p class="text-muted">Update the contact details linked to your resident account.</p>
+<form asp-action="Profile" method="post" class="row g-3 col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="col-md-6"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" autocomplete="name" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" readonly autocomplete="email" /></div>
+    <div class="col-md-6"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" autocomplete="tel" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
+    <div class="col-12"><label asp-for="Address" class="form-label"></label><textarea asp-for="Address" class="form-control" rows="3" autocomplete="street-address"></textarea><span asp-validation-for="Address" class="text-danger small"></span></div>
+    <div class="col-12"><button class="btn btn-primary" type="submit">Update profile</button> <a asp-controller="ResidentPortal" asp-action="Index" class="btn btn-link">Cancel</a></div>
+</form>

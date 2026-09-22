@@ -8,15 +8,30 @@ using WaterSupply.Web.Models.BillingViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public sealed class BillsController(ApplicationDbContext context) : Controller
 {
     public async Task<IActionResult> Index(BillStatus? status = null)
     {
-        var query = context.Bills.AsNoTracking().OrderByDescending(bill => bill.BillDate).AsQueryable();
+        var query = context.Bills
+            .AsNoTracking()
+            .Join(
+                context.WaterConnections.AsNoTracking(),
+                bill => bill.WaterConnectionId,
+                connection => connection.WaterConnectionId,
+                (bill, connection) => new BillListItemViewModel
+                {
+                    BillId = bill.BillId,
+                    ConnectionNumber = connection.ConnectionNumber,
+                    BillDate = bill.BillDate,
+                    TotalAmount = bill.TotalAmount,
+                    DueDate = bill.DueDate,
+                    Status = bill.Status
+                })
+            .AsQueryable();
         if (status is not null) query = query.Where(bill => bill.Status == status);
         ViewBag.Status = status;
-        return View(await query.ToListAsync());
+        return View(await query.OrderByDescending(bill => bill.BillDate).ThenBy(bill => bill.ConnectionNumber).ToListAsync());
     }
 
     public async Task<IActionResult> Create()
@@ -34,11 +49,16 @@ public sealed class BillsController(ApplicationDbContext context) : Controller
             return View(model);
         }
 
-        var connectionExists = await context.WaterConnections
-            .AnyAsync(connection => connection.WaterConnectionId == model.WaterConnectionId);
-        if (!connectionExists)
+        var connection = await context.WaterConnections
+            .AsNoTracking()
+            .SingleOrDefaultAsync(item => item.WaterConnectionId == model.WaterConnectionId);
+        if (connection is null)
         {
             ModelState.AddModelError(nameof(model.WaterConnectionId), "Select a valid water connection.");
+        }
+        else if (connection.Status != ConnectionStatus.Active)
+        {
+            ModelState.AddModelError(nameof(model.WaterConnectionId), "The selected water connection is inactive.");
         }
 
         var reading = await context.MeterReadings
@@ -87,6 +107,7 @@ public sealed class BillsController(ApplicationDbContext context) : Controller
     {
         ViewBag.Connections = await context.WaterConnections
             .AsNoTracking()
+            .Where(connection => connection.Status == WaterSupply.Domain.Enums.ConnectionStatus.Active)
             .OrderBy(connection => connection.ConnectionNumber)
             .ToListAsync();
         ViewBag.Readings = await context.MeterReadings

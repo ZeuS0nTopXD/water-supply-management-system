@@ -7,7 +7,7 @@ using WaterSupply.Web.Models.ResidentViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public sealed class ResidentsController(ApplicationDbContext context) : Controller
 {
     public async Task<IActionResult> Index(string? search, string? error)

@@ -29,6 +29,16 @@ public sealed class WaterConnection
     public DateOnly ConnectionDate { get; private set; }
     public ConnectionStatus Status { get; private set; }
 
+    public void UpdateDetails(int residentId, string connectionNumber, ConnectionType type, string meterNumber, DateOnly connectionDate)
+    {
+        if (residentId <= 0) throw new DomainValidationException("A valid resident is required.");
+        ResidentId = residentId;
+        ConnectionNumber = Required(connectionNumber, nameof(connectionNumber));
+        ConnectionType = type;
+        MeterNumber = Required(meterNumber, nameof(meterNumber));
+        ConnectionDate = connectionDate;
+    }
+
     public void ChangeStatus(ConnectionStatus status) => Status = status;
 
     private static string Required(string value, string name)

@@ -10,6 +10,11 @@ public sealed class DashboardController(DashboardQueryService dashboard) : Contr
 {
     public async Task<IActionResult> Index(string? month = null)
     {
+        if (User.IsInRole("Resident"))
+        {
+            return RedirectToAction(nameof(ResidentPortalController.Index), "ResidentPortal");
+        }
+
         var selectedMonth = ParseMonth(month) ?? DateOnly.FromDateTime(DateTime.Today);
         return View(await dashboard.GetSummaryAsync(selectedMonth));
     }

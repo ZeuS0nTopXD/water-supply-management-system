@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WaterSupply.Domain.Entities;
 using WaterSupply.Web.Data;
 using WaterSupply.Web.Models.AccountViewModels;
@@ -101,6 +103,42 @@ public sealed class AccountController(
     [Authorize]
     public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
 
+    [Authorize(Roles = "Resident")]
+    public async Task<IActionResult> Profile()
+    {
+        var resident = await FindCurrentResidentAsync();
+        return resident is null
+            ? Forbid()
+            : View(new ResidentProfileViewModel
+            {
+                FullName = resident.FullName,
+                Email = resident.Email,
+                Phone = resident.Phone,
+                Address = resident.Address
+            });
+    }
+
+    [HttpPost, Authorize(Roles = "Resident"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Profile(ResidentProfileViewModel model)
+    {
+        var resident = await FindCurrentResidentAsync();
+        if (resident is null) return Forbid();
+        if (!ModelState.IsValid) return View(model);
+
+        resident.UpdateContact(model.FullName, resident.Email, model.Phone, model.Address);
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(string.Empty, "Your profile could not be updated. Please try again.");
+            return View(model);
+        }
+
+        return RedirectToAction("Index", "ResidentPortal");
+    }
+
     [HttpPost, Authorize, ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
@@ -117,5 +155,14 @@ public sealed class AccountController(
     private void AddErrors(IdentityResult result)
     {
         foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
+    }
+
+    private Task<Resident?> FindCurrentResidentAsync()
+    {
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        return context.Residents.SingleOrDefaultAsync(resident =>
+            (identityUserId != null && resident.IdentityUserId == identityUserId)
+            || (email != null && resident.Email == email));
     }
 }

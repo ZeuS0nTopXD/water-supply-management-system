@@ -8,6 +8,8 @@ public sealed class HomeController : Controller
 {
     public IActionResult Index() => View();
 
+    public IActionResult AccessDenied() => View();
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() => View(new ErrorViewModel
     {

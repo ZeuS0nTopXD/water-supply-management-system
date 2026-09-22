@@ -19,12 +19,22 @@
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <li class="nav-item"><a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Residents" asp-action="Index">Residents</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="WaterConnections" asp-action="Index">Connections</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="MeterReadings" asp-action="Index">Readings</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Bills" asp-action="Index">Bills</a></li>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Residents" asp-action="Index">Residents</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="WaterConnections" asp-action="Index">Connections</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="MeterReadings" asp-action="Index">Readings</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Bills" asp-action="Index">Bills</a></li>
+                    }
                     <li class="nav-item"><a class="nav-link" asp-controller="ServiceRequests" asp-action="Index">Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                    @if (User.IsInRole("Resident"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Profile">My profile</a></li>
+                    }
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                    }
                 }
             </ul>
             <div class="d-flex gap-2 align-items-center">

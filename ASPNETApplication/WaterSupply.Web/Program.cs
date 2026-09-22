@@ -6,6 +6,11 @@ using WaterSupply.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Keep hosting diagnostics portable. The Windows Event Log provider can throw
+// when the process does not have permission to write to the machine event log.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
         "Connection string 'DefaultConnection' not found.");
@@ -43,6 +48,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Home/AccessDenied";
 });
 
 builder.Services.AddControllersWithViews();

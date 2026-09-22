@@ -3,7 +3,15 @@
 <h1>Add service request</h1>
 <form asp-action="Create" method="post" class="row g-3 col-lg-8">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-    <div class="col-md-6"><label asp-for="ResidentId" class="form-label"></label><select asp-for="ResidentId" class="form-select"><option value="">Select resident</option>@foreach (var resident in residents) { <option value="@resident.ResidentId">@resident.FullName</option> }</select><span asp-validation-for="ResidentId" class="text-danger small"></span></div>
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="col-md-6"><label asp-for="ResidentId" class="form-label"></label><select asp-for="ResidentId" class="form-select"><option value="">Select resident</option>@foreach (var resident in residents) { <option value="@resident.ResidentId">@resident.FullName</option> }</select><span asp-validation-for="ResidentId" class="text-danger small"></span></div>
+    }
+    else
+    {
+        <input asp-for="ResidentId" type="hidden" />
+        <div class="col-md-6"><label class="form-label">Resident</label><div class="form-control-plaintext">@ViewBag.CurrentResidentName</div></div>
+    }
     <div class="col-md-6"><label asp-for="WaterConnectionId" class="form-label"></label><select asp-for="WaterConnectionId" class="form-select"><option value="">No specific connection</option>@foreach (var connection in connections) { <option value="@connection.WaterConnectionId">@connection.ConnectionNumber</option> }</select><span asp-validation-for="WaterConnectionId" class="text-danger small"></span></div>
     <div class="col-md-6"><label asp-for="RequestType" class="form-label"></label><select asp-for="RequestType" asp-items="Html.GetEnumSelectList<RequestType>()" class="form-select"></select><span asp-validation-for="RequestType" class="text-danger small"></span></div>
     <div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the issue clearly"></textarea><span asp-validation-for="Description" class="text-danger small"></span></div>

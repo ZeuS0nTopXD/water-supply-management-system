@@ -1,6 +1,10 @@
-@model IEnumerable<WaterConnection>
+@model IEnumerable<ConnectionListItemViewModel>
 @{ ViewData["Title"] = "Water Connections"; }
 <div class="d-flex justify-content-between align-items-center mb-3"><h1>Water connections</h1><a class="btn btn-primary" asp-action="Create">Add connection</a></div>
+@if (TempData["Message"] is string message)
+{
+    <div class="alert alert-info" role="status">@message</div>
+}
 <form method="get" class="row g-2 mb-3"><div class="col-sm-8"><label class="visually-hidden" for="connection-search">Search connections</label><input id="connection-search" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by connection or meter number" /></div><div class="col-sm-4"><button class="btn btn-outline-secondary w-100" type="submit">Search connections</button></div></form>
 @if (!Model.Any())
 {
@@ -8,5 +12,5 @@
 }
 else
 {
-<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Connection number</th><th>Meter number</th><th>Resident ID</th><th>Type</th><th>Status</th></tr></thead><tbody>@foreach (var connection in Model) { <tr><td>@connection.ConnectionNumber</td><td>@connection.MeterNumber</td><td>@connection.ResidentId</td><td>@connection.ConnectionType</td><td>@connection.Status</td></tr> }</tbody></table></div>
+<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Connection number</th><th>Resident</th><th>Meter number</th><th>Type</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>@foreach (var connection in Model) { <tr><td>@connection.ConnectionNumber</td><td>@connection.ResidentName</td><td>@connection.MeterNumber</td><td>@connection.ConnectionType</td><td>@(connection.Status == ConnectionStatus.Active ? "Active" : "Inactive")</td><td class="text-end"><a asp-action="Edit" asp-route-id="@connection.WaterConnectionId" class="btn btn-sm btn-outline-secondary">Edit</a> @if (connection.Status == ConnectionStatus.Active) { <form asp-action="Deactivate" asp-route-id="@connection.WaterConnectionId" method="post" class="d-inline"><button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Remove this connection? Connections with history will be deactivated instead.')">Remove</button></form> } else { <span class="text-muted small ms-1">Not available for new readings</span> }</td></tr> }</tbody></table></div>
 }

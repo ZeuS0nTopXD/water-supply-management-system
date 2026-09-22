@@ -34,6 +34,7 @@ public static class DbInitializer
             "Resident@12345",
             "Resident");
 
+        await LinkResidentProfileAsync(context, residentUser);
         await DemoDataSeeder.SeedAsync(context, residentUser.Id);
 
         _ = admin;
@@ -113,5 +114,21 @@ public static class DbInitializer
                 string.Join("; ",
                     result.Errors.Select(error => error.Description)));
         }
+    }
+
+    private static async Task LinkResidentProfileAsync(
+        ApplicationDbContext context,
+        IdentityUser residentUser)
+    {
+        if (await context.Residents.AnyAsync(resident => resident.IdentityUserId == residentUser.Id)) return;
+
+        var profile = await context.Residents
+            .Where(resident => resident.IdentityUserId == null)
+            .OrderBy(resident => resident.ResidentId)
+            .FirstOrDefaultAsync();
+        if (profile is null) return;
+
+        profile.LinkIdentityUser(residentUser.Id);
+        await context.SaveChangesAsync();
     }
 }

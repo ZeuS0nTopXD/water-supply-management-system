@@ -13,7 +13,7 @@ public sealed class BillReportViewModel
 public sealed class BillReportRowViewModel
 {
     public int BillId { get; init; }
-    public int WaterConnectionId { get; init; }
+    public string ConnectionNumber { get; init; } = string.Empty;
     public DateOnly BillDate { get; init; }
     public decimal TotalAmount { get; init; }
     public DateOnly DueDate { get; init; }

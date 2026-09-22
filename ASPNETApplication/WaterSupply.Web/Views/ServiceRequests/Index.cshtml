@@ -13,18 +13,19 @@ else
 {
     <div class="d-none d-md-block table-responsive">
         <table class="table table-striped align-middle">
-            <thead><tr><th>Type</th><th>Resident</th><th>Description</th><th>Created</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Type</th><th>Resident</th><th>Connection number</th><th>Description</th><th>Created</th><th>Status</th><th></th></tr></thead>
             <tbody>
             @foreach (var request in requests)
             {
                 var statusClass = request.Status switch { RequestStatus.Closed => "text-bg-success", RequestStatus.InProgress => "text-bg-warning", _ => "text-bg-primary" };
                 <tr>
                     <td>@request.RequestTypeLabel</td>
-                    <td>@request.ResidentName <small class="text-muted d-block">Resident #@request.ResidentId</small></td>
+                    <td>@request.ResidentName</td>
+                    <td>@(request.ConnectionNumber ?? "Not connection-specific")</td>
                     <td class="text-break">@request.Description</td>
                     <td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
                     <td><span class="badge @statusClass">@request.StatusLabel</span></td>
-                    <td><a asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update</a></td>
+                    <td>@if (User.IsInRole("Administrator")) { <a asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update</a> }</td>
                 </tr>
             }
             </tbody>
@@ -38,13 +39,13 @@ else
             <article class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                        <div><h2 class="h5 mb-1">@request.RequestTypeLabel</h2><div class="text-muted small">@request.ResidentName</div></div>
+                        <div><h2 class="h5 mb-1">@request.RequestTypeLabel</h2><div class="text-muted small">@request.ResidentName</div><div class="text-muted small">@(request.ConnectionNumber ?? "Not connection-specific")</div></div>
                         <span class="badge @statusClass">@request.StatusLabel</span>
                     </div>
                     <p class="mb-3 text-break">@request.Description</p>
                     <div class="d-flex justify-content-between align-items-center small text-muted">
                         <span>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
-                        <a asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update status</a>
+                        @if (User.IsInRole("Administrator")) { <a asp-action="UpdateStatus" asp-route-id="@request.ServiceRequestId">Update status</a> }
                     </div>
                 </div>
             </article>

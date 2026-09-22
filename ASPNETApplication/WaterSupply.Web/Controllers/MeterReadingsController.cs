@@ -2,16 +2,38 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WaterSupply.Domain.Entities;
+using WaterSupply.Domain.Enums;
 using WaterSupply.Domain.Exceptions;
 using WaterSupply.Web.Data;
 using WaterSupply.Web.Models.MeterReadingViewModels;
 
 namespace WaterSupply.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public sealed class MeterReadingsController(ApplicationDbContext context) : Controller
 {
-    public async Task<IActionResult> Index() => View(await context.MeterReadings.AsNoTracking().OrderByDescending(reading => reading.ReadingDate).ToListAsync());
+    public async Task<IActionResult> Index()
+    {
+        var model = await context.MeterReadings
+            .AsNoTracking()
+            .Join(
+                context.WaterConnections.AsNoTracking(),
+                reading => reading.WaterConnectionId,
+                connection => connection.WaterConnectionId,
+                (reading, connection) => new MeterReadingListItemViewModel
+                {
+                    ConnectionNumber = connection.ConnectionNumber,
+                    ReadingDate = reading.ReadingDate,
+                    PreviousReading = reading.PreviousReading,
+                    CurrentReading = reading.CurrentReading,
+                    Consumption = reading.Consumption
+                })
+            .OrderByDescending(reading => reading.ReadingDate)
+            .ThenBy(reading => reading.ConnectionNumber)
+            .ToListAsync();
+
+        return View(model);
+    }
 
     public async Task<IActionResult> Create()
     {
@@ -28,9 +50,16 @@ public sealed class MeterReadingsController(ApplicationDbContext context) : Cont
             return View(model);
         }
 
-        if (!await context.WaterConnections.AnyAsync(connection => connection.WaterConnectionId == model.WaterConnectionId))
+        var connection = await context.WaterConnections
+            .AsNoTracking()
+            .SingleOrDefaultAsync(item => item.WaterConnectionId == model.WaterConnectionId);
+        if (connection is null)
         {
             ModelState.AddModelError(nameof(model.WaterConnectionId), "Select a valid water connection.");
+        }
+        else if (connection.Status != ConnectionStatus.Active)
+        {
+            ModelState.AddModelError(nameof(model.WaterConnectionId), "The selected water connection is inactive.");
         }
 
         if (await context.MeterReadings.AnyAsync(reading =>
@@ -73,6 +102,7 @@ public sealed class MeterReadingsController(ApplicationDbContext context) : Cont
     {
         ViewBag.Connections = await context.WaterConnections
             .AsNoTracking()
+            .Where(connection => connection.Status == WaterSupply.Domain.Enums.ConnectionStatus.Active)
             .OrderBy(connection => connection.ConnectionNumber)
             .ToListAsync();
     }

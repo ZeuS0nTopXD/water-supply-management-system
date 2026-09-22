@@ -17,7 +17,7 @@ WaterSupplyManagementSystem/
 
 ## Project scope
 
-The project manages five business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. It intentionally excludes payments, notifications as a business table, resident portals, and advanced workflows so the project remains easy to understand.
+The project manages five business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. It includes separate administrator and resident workflows, connection deactivation that preserves history, human-readable connection numbers, and a lightweight PWA shell. Payments are outside the current scope.
 
 ## Technology
 
@@ -56,7 +56,7 @@ $env:WATER_SUPPLY_DEMO_DATA = "true"
 dotnet run --project ASPNETApplication/WaterSupply.Web --urls http://127.0.0.1:5077
 ```
 
-This preview includes four residents, four connections, current-month meter readings, bills, and service requests. Use `admin@watersupply.local` / `Admin@12345` to open the dashboard.
+This preview includes four residents, four connections, current-month meter readings, bills, and service requests. Use `admin@watersupply.local` / `Admin@12345` to open the administrator dashboard, or `resident@watersupply.local` / `Resident@12345` to open the resident portal.
 
 ### Deploy the presentation preview to Vercel
 

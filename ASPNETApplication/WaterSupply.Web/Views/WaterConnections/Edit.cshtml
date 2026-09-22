@@ -1,0 +1,13 @@
+@model ConnectionEditViewModel
+@{ ViewData["Title"] = "Edit Connection"; var residents = ViewBag.Residents as IEnumerable<Resident> ?? []; }
+<h1>Edit water connection</h1>
+<form asp-action="Edit" method="post" class="row g-3 col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="col-md-6"><label asp-for="ResidentId" class="form-label"></label><select asp-for="ResidentId" class="form-select"><option value="">Select resident</option>@foreach (var resident in residents) { <option value="@resident.ResidentId">@resident.FullName</option> }</select><span asp-validation-for="ResidentId" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="ConnectionNumber" class="form-label"></label><input asp-for="ConnectionNumber" class="form-control" placeholder="e.g. WS-001" /><span asp-validation-for="ConnectionNumber" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="ConnectionType" class="form-label"></label><select asp-for="ConnectionType" asp-items="Html.GetEnumSelectList<ConnectionType>()" class="form-select"></select><span asp-validation-for="ConnectionType" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="MeterNumber" class="form-label"></label><input asp-for="MeterNumber" class="form-control" placeholder="e.g. MTR-001" /><span asp-validation-for="MeterNumber" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="ConnectionDate" class="form-label"></label><input asp-for="ConnectionDate" class="form-control" /><span asp-validation-for="ConnectionDate" class="text-danger small"></span></div>
+    <input asp-for="Status" type="hidden" />
+    <div class="col-12"><button class="btn btn-primary" type="submit">Save changes</button> <a asp-action="Index" class="btn btn-link">Cancel</a></div>
+</form>
