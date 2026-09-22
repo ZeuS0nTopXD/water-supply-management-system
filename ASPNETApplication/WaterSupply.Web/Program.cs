@@ -6,15 +6,11 @@ using WaterSupply.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var dataProtectionPath = Path.Combine(Path.GetTempPath(), "WaterSupplyManagementSystem-DataProtectionKeys");
-Directory.CreateDirectory(dataProtectionPath);
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-    .SetApplicationName("WaterSupplyManagementSystem");
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' not found.");
 
+// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (builder.Environment.IsEnvironment("Testing"))
@@ -26,21 +22,37 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString);
     }
 });
+
+// Persist Data Protection keys in the database.
+// This keeps antiforgery and authentication cookies valid
+// across different/restarted deployment instances.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<ApplicationDbContext>()
+    .SetApplicationName("WaterSupplyManagementSystem");
+
+// ASP.NET Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-    {
-        options.SignIn.RequireConfirmedAccount = false;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequiredLength = 6;
-    })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-builder.Services.ConfigureApplicationCookie(options => options.LoginPath = "/Account/Login");
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<DashboardQueryService>();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
+// Production error handling
+if (!app.Environment.IsDevelopment() &&
+    !app.Environment.IsEnvironment("Testing"))
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -50,8 +62,11 @@ if (!app.Environment.IsEnvironment("Testing"))
 {
     app.UseHttpsRedirection();
 }
+
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -59,6 +74,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Seed database
 var seedPreviewData = string.Equals(
     Environment.GetEnvironmentVariable("WATER_SUPPLY_DEMO_DATA"),
     "true",
