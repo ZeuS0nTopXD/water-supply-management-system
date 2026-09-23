@@ -140,9 +140,14 @@ public sealed class ConnectionRequestWorkflowTests
     {
         ReadWebFile("Views", "ResidentPortal", "Index.cshtml")
             .Should().Contain("Request a water connection")
-            .And.Contain("My connection requests");
+            .And.Contain("Request a connection")
+            .And.Contain("Each apartment can have one water connection");
+        ReadWebFile("Views", "Shared", "_Layout.cshtml")
+            .Should().Contain("Request a connection")
+            .And.NotContain("My connection requests");
         ReadWebFile("Views", "ConnectionRequests", "Index.cshtml")
             .Should().Contain("Review connection requests")
+            .And.Contain("Submit one connection application for your apartment")
             .And.Contain("Create connection after approval");
         ReadWebFile("Views", "Residents", "_Form.cshtml")
             .Should().Contain("register using this exact email")

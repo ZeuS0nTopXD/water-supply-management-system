@@ -1,9 +1,9 @@
 @model IEnumerable<ConnectionRequestListItemViewModel>
-@{ var isResident = (bool?)ViewBag.IsResident ?? User.IsInRole("Resident"); var requests = Model.ToList(); ViewData["Title"] = isResident ? "My Connection Requests" : "Connection Requests"; }
+@{ var isResident = (bool?)ViewBag.IsResident ?? User.IsInRole("Resident"); var requests = Model.ToList(); ViewData["Title"] = isResident ? "Request a Connection" : "Connection Requests"; }
 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
     <div>
-        <h1 class="mb-1">@(isResident ? "My connection requests" : "Review connection requests")</h1>
-        <p class="text-muted mb-0">@(isResident ? "Apply for a new water connection and track the administrator's decision." : "Review resident applications, update their status, then create the connection after approval.")</p>
+        <h1 class="mb-1">@(isResident ? "Request a connection" : "Review connection requests")</h1>
+        <p class="text-muted mb-0">@(isResident ? "Submit one connection application for your apartment and track the administrator's decision." : "Review resident applications, update their status, then create the connection after approval.")</p>
     </div>
     @if (isResident)
     {
@@ -19,7 +19,7 @@
 }
 @if (requests.Count == 0)
 {
-    <div class="alert alert-light border">@(isResident ? "You have not submitted a connection request yet." : "No connection requests match this filter.")</div>
+    <div class="alert alert-light border">@(isResident ? "You have not submitted a connection application yet." : "No connection requests match this filter.")</div>
 }
 else
 {

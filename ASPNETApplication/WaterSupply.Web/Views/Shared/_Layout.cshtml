@@ -30,7 +30,7 @@
                     <li class="nav-item"><a class="nav-link" asp-controller="ServiceRequests" asp-action="Index">@(User.IsInRole("Resident") ? "My requests" : "Service requests")</a></li>
                     @if (User.IsInRole("Resident"))
                     {
-                        <li class="nav-item"><a class="nav-link" asp-controller="ConnectionRequests" asp-action="Index">My connection requests</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="ConnectionRequests" asp-action="Index">Request a connection</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Profile">My profile</a></li>
                     }
                     @if (User.IsInRole("Administrator"))
