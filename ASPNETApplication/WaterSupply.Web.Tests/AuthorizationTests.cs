@@ -83,12 +83,58 @@ public sealed class AuthorizationTests
         }));
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        new Uri(new Uri("http://localhost"), response.Headers.Location!).AbsolutePath.Should().Be("/Dashboard");
+        new Uri(new Uri("http://localhost"), response.Headers.Location!).AbsolutePath.Should().Be("/ResidentPortal");
 
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var registeredUser = await userManager.FindByEmailAsync("new.resident@example.com");
+        registeredUser.Should().NotBeNull();
+        (await userManager.IsInRoleAsync(registeredUser!, "Resident")).Should().BeTrue();
         (await db.Users.CountAsync(user => user.Email == "new.resident@example.com")).Should().Be(1);
         (await db.Residents.CountAsync(resident => resident.Email == "new.resident@example.com")).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Registration_activates_an_existing_manual_resident_profile_instead_of_creating_a_duplicate()
+    {
+        using var factory = new TestWebApplicationFactory();
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.Residents.Add(new WaterSupply.Domain.Entities.Resident(
+                0,
+                "Manual Resident",
+                "manual.login@example.com",
+                "9999999999",
+                "Manual Street",
+                new DateOnly(2026, 1, 1)));
+            await db.SaveChangesAsync();
+        }
+
+        using var client = factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var registerPage = await client.GetAsync("/Account/Register");
+        var html = await registerPage.Content.ReadAsStringAsync();
+        var token = System.Text.RegularExpressions.Regex.Match(html, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
+
+        var response = await client.PostAsync("/Account/Register", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = token,
+            ["FullName"] = "Manual Resident Updated",
+            ["Email"] = "manual.login@example.com",
+            ["Phone"] = "8888888888",
+            ["Address"] = "Updated Street",
+            ["Password"] = "Resident123",
+            ["ConfirmPassword"] = "Resident123"
+        }));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        using var verifyScope = factory.Services.CreateScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var resident = await verifyDb.Residents.SingleAsync(item => item.Email == "manual.login@example.com");
+        resident.IdentityUserId.Should().NotBeNullOrWhiteSpace();
+        resident.FullName.Should().Be("Manual Resident Updated");
+        (await verifyDb.Residents.CountAsync(item => item.Email == "manual.login@example.com")).Should().Be(1);
     }
 
     [Fact]

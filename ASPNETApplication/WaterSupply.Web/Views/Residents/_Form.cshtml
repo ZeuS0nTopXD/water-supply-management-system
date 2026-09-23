@@ -1,4 +1,7 @@
 @model ResidentEditViewModel
+<div class="alert alert-info" role="note">
+    <strong>How the resident logs in:</strong> this creates a resident profile for staff records. Tell the resident to open <a asp-controller="Account" asp-action="Register">registration</a> and register using this exact email address. Registration creates their password, links this profile, and takes them to the resident portal. A new manual profile starts as <strong>Not activated</strong> until they register.
+</div>
 <form method="post" class="row g-3 col-lg-8">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
     <div class="col-md-6"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" autocomplete="name" placeholder="e.g. Asha Patil" /><span asp-validation-for="FullName" class="text-danger small"></span></div>

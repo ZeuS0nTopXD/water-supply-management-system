@@ -123,8 +123,8 @@ public static class DbInitializer
         if (await context.Residents.AnyAsync(resident => resident.IdentityUserId == residentUser.Id)) return;
 
         var profile = await context.Residents
-            .Where(resident => resident.IdentityUserId == null)
-            .OrderBy(resident => resident.ResidentId)
+            .Where(resident => resident.IdentityUserId == null
+                && resident.Email.ToLower() == residentUser.Email!.ToLower())
             .FirstOrDefaultAsync();
         if (profile is null) return;
 

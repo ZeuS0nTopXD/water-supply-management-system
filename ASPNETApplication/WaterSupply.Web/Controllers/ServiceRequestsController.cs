@@ -53,6 +53,7 @@ public sealed class ServiceRequestsController(ApplicationDbContext context) : Co
         return View(model);
     }
 
+    [Authorize(Roles = "Resident")]
     public async Task<IActionResult> Create()
     {
         var isResident = ControllerContext.HttpContext?.User?.IsInRole("Resident") == true;
@@ -65,7 +66,7 @@ public sealed class ServiceRequestsController(ApplicationDbContext context) : Co
         return View(new ServiceRequestCreateViewModel { ResidentId = currentResident?.ResidentId ?? 0 });
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, Authorize(Roles = "Resident"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ServiceRequestCreateViewModel model)
     {
         var isResident = ControllerContext.HttpContext?.User?.IsInRole("Resident") == true;

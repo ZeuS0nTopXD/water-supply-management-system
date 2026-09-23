@@ -7,7 +7,7 @@ if (-not (Test-Path -LiteralPath $schemaPath)) {
 }
 
 $sql = Get-Content -Raw -LiteralPath $schemaPath
-$tables = @('Residents', 'WaterConnections', 'MeterReadings', 'Bills', 'ServiceRequests')
+$tables = @('Residents', 'WaterConnections', 'MeterReadings', 'Bills', 'ServiceRequests', 'WaterConnectionRequests')
 $missing = [System.Collections.Generic.List[string]]::new()
 
 foreach ($table in $tables) {
@@ -24,7 +24,8 @@ $relationships = @(
     'Bills.*REFERENCES.*WaterConnections',
     'Bills.*REFERENCES.*MeterReadings',
     'ServiceRequests.*REFERENCES.*Residents',
-    'ServiceRequests.*REFERENCES.*WaterConnections'
+    'ServiceRequests.*REFERENCES.*WaterConnections',
+    'WaterConnectionRequests.*REFERENCES.*Residents'
 )
 
 foreach ($relationship in $relationships) {
@@ -36,4 +37,4 @@ if ($missing.Count -gt 0) {
     exit 1
 }
 
-Write-Output "PASS: five tables, primary keys, and required foreign-key relationships found."
+Write-Output "PASS: six business tables, primary keys, and required foreign-key relationships found."

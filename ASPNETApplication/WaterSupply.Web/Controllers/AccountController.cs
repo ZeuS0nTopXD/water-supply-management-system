@@ -26,7 +26,9 @@ public sealed class AccountController(
     {
         if (!ModelState.IsValid) return View(model);
 
-        if (await userManager.FindByEmailAsync(model.Email) is not null)
+        var email = model.Email.Trim();
+        var normalizedEmail = email.ToLowerInvariant();
+        if (await userManager.FindByEmailAsync(email) is not null)
         {
             ModelState.AddModelError(nameof(model.Email), "That email is already registered.");
             return View(model);
@@ -34,8 +36,8 @@ public sealed class AccountController(
 
         var user = new IdentityUser
         {
-            UserName = model.Email,
-            Email = model.Email,
+            UserName = email,
+            Email = email,
             EmailConfirmed = true
         };
         var createResult = await userManager.CreateAsync(user, model.Password);
@@ -50,6 +52,7 @@ public sealed class AccountController(
             var roleResult = await roleManager.CreateAsync(new IdentityRole("Resident"));
             if (!roleResult.Succeeded)
             {
+                await userManager.DeleteAsync(user);
                 AddErrors(roleResult);
                 return View(model);
             }
@@ -58,21 +61,50 @@ public sealed class AccountController(
         var addRoleResult = await userManager.AddToRoleAsync(user, "Resident");
         if (!addRoleResult.Succeeded)
         {
+            await userManager.DeleteAsync(user);
             AddErrors(addRoleResult);
             return View(model);
         }
 
-        context.Residents.Add(new Resident(
-            0,
-            model.FullName,
-            model.Email,
-            model.Phone,
-            model.Address,
-            DateOnly.FromDateTime(DateTime.Today),
-            identityUserId: user.Id));
-        await context.SaveChangesAsync();
+        var existingProfile = await context.Residents
+            .SingleOrDefaultAsync(resident => resident.Email.ToLower() == normalizedEmail);
+        if (existingProfile?.IdentityUserId is not null)
+        {
+            await userManager.DeleteAsync(user);
+            ModelState.AddModelError(nameof(model.Email), "A resident profile with this email is already activated. Try logging in instead.");
+            return View(model);
+        }
+
+        if (existingProfile is null)
+        {
+            context.Residents.Add(new Resident(
+                0,
+                model.FullName,
+                email,
+                model.Phone,
+                model.Address,
+                DateOnly.FromDateTime(DateTime.Today),
+                identityUserId: user.Id));
+        }
+        else
+        {
+            existingProfile.UpdateContact(model.FullName, email, model.Phone, model.Address);
+            existingProfile.Activate();
+            existingProfile.LinkIdentityUser(user.Id);
+        }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            await userManager.DeleteAsync(user);
+            ModelState.AddModelError(string.Empty, "Your account could not be linked to a resident profile. Please try again or contact the administrator.");
+            return View(model);
+        }
         await signInManager.SignInAsync(user, isPersistent: false);
-        return RedirectToAction("Index", "Dashboard");
+        return RedirectToAction("Index", "ResidentPortal");
     }
 
     [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]

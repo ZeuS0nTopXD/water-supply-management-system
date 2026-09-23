@@ -15,10 +15,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException(
         "Connection string 'DefaultConnection' not found.");
 
+var seedPreviewData = string.Equals(
+    Environment.GetEnvironmentVariable("WATER_SUPPLY_DEMO_DATA"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
+
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (builder.Environment.IsEnvironment("Testing"))
+    if (builder.Environment.IsEnvironment("Testing") || seedPreviewData)
     {
         options.UseInMemoryDatabase("WaterSupplyPreview");
     }
@@ -81,11 +86,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Seed database
-var seedPreviewData = string.Equals(
-    Environment.GetEnvironmentVariable("WATER_SUPPLY_DEMO_DATA"),
-    "true",
-    StringComparison.OrdinalIgnoreCase);
-
 if (!app.Environment.IsEnvironment("Testing") || seedPreviewData)
 {
     await DbInitializer.InitializeAsync(app.Services);

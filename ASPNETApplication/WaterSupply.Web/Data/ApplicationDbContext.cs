@@ -18,6 +18,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<MeterReading> MeterReadings => Set<MeterReading>();
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<ServiceRequest> ServiceRequests => Set<ServiceRequest>();
+    public DbSet<WaterConnectionRequest> WaterConnectionRequests => Set<WaterConnectionRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -182,6 +183,41 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
                 .WithMany()
                 .HasForeignKey(request => request.WaterConnectionId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<WaterConnectionRequest>(entity =>
+        {
+            entity.ToTable("WaterConnectionRequests");
+            entity.HasKey(request => request.WaterConnectionRequestId)
+                .HasName("PK_WaterConnectionRequests");
+
+            entity.Property(request => request.WaterConnectionRequestId)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(request => request.RequestedType)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(request => request.ServiceAddress)
+                .HasMaxLength(300)
+                .IsRequired();
+
+            entity.Property(request => request.Notes)
+                .HasMaxLength(1000);
+
+            entity.Property(request => request.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(request => request.StaffNotes)
+                .HasMaxLength(1000);
+
+            entity.HasOne<Resident>()
+                .WithMany()
+                .HasForeignKey(request => request.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

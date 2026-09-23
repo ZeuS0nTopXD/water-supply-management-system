@@ -35,3 +35,12 @@ public enum RequestStatus
     InProgress,
     Closed
 }
+
+public enum ConnectionRequestStatus
+{
+    Pending,
+    [Display(Name = "In review")]
+    InReview,
+    Approved,
+    Rejected
+}

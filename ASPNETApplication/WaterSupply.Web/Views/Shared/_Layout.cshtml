@@ -25,10 +25,12 @@
                         <li class="nav-item"><a class="nav-link" asp-controller="WaterConnections" asp-action="Index">Connections</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="MeterReadings" asp-action="Index">Readings</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Bills" asp-action="Index">Bills</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="ConnectionRequests" asp-action="Index">Connection requests</a></li>
                     }
-                    <li class="nav-item"><a class="nav-link" asp-controller="ServiceRequests" asp-action="Index">Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="ServiceRequests" asp-action="Index">@(User.IsInRole("Resident") ? "My requests" : "Service requests")</a></li>
                     @if (User.IsInRole("Resident"))
                     {
+                        <li class="nav-item"><a class="nav-link" asp-controller="ConnectionRequests" asp-action="Index">My connection requests</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Profile">My profile</a></li>
                     }
                     @if (User.IsInRole("Administrator"))
@@ -51,9 +53,18 @@
         </div>
     </nav>
 </header>
-<main id="main-content" class="container py-4">@RenderBody()</main>
+<main id="main-content" class="container py-4">
+    @if (TempData["Message"] is string message && !string.IsNullOrWhiteSpace(message))
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @RenderBody()
+</main>
 <footer class="container border-top py-3 text-muted small">Water Supply Management System</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
 <script src="~/js/site.js"></script>
 <script src="~/js/pwa-notifications.js"></script>
 @await RenderSectionAsync("Scripts", required: false)

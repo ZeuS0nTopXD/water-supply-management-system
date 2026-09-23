@@ -12,11 +12,19 @@
     </div>
 </div>
 <div class="d-flex flex-wrap gap-2 mb-4 no-print">
-    <a class="btn btn-sm btn-outline-primary" asp-controller="Residents" asp-action="Create">Add resident</a>
+    <a class="btn btn-sm btn-outline-primary" asp-controller="Residents" asp-action="Create">Add resident profile</a>
     <a class="btn btn-sm btn-outline-primary" asp-controller="WaterConnections" asp-action="Create">Add connection</a>
     <a class="btn btn-sm btn-outline-primary" asp-controller="MeterReadings" asp-action="Create">Record reading</a>
     <a class="btn btn-sm btn-outline-primary" asp-controller="Bills" asp-action="Create">Add bill</a>
-    <a class="btn btn-sm btn-outline-primary" asp-controller="ServiceRequests" asp-action="Create">New request</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-controller="ServiceRequests" asp-action="Index">Review service requests</a>
+</div>
+<div class="alert alert-info no-print" role="note">
+    <h2 class="h6 mb-2">Recommended workflow</h2>
+    <ol class="mb-0 ps-3">
+        <li>Registered users already appear as residents; use <strong>Add resident profile</strong> only for staff-created records.</li>
+        <li>Assign each resident a water connection, then record readings and create bills.</li>
+        <li>Residents submit connection applications or report service issues from their portal; staff review both queues here.</li>
+    </ol>
 </div>
 <div class="row g-3">
     <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted">Residents</div><div class="display-6">@Model.ResidentCount</div></div></div></div>
@@ -28,6 +36,12 @@
     <div class="col-md-4"><div class="card h-100 border-primary"><div class="card-body"><div class="text-muted">Active requests</div><div class="display-6">@Model.OpenServiceRequestCount</div></div></div></div>
     <div class="col-md-4"><div class="card h-100 border-warning"><div class="card-body"><div class="text-muted">In progress</div><div class="display-6">@Model.InProgressServiceRequestCount</div></div></div></div>
     <div class="col-md-4"><div class="card h-100 border-success"><div class="card-body"><div class="text-muted">Closed requests</div><div class="display-6">@Model.ClosedServiceRequestCount</div></div></div></div>
+</div>
+<div class="card mt-3 border-info">
+    <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+        <div><h2 class="h5 mb-1">Connection applications</h2><p class="text-muted mb-0">Residents waiting for a new water connection.</p></div>
+        <div class="d-flex align-items-center gap-3"><span class="display-6">@Model.PendingConnectionRequestCount</span><a class="btn btn-outline-primary" asp-controller="ConnectionRequests" asp-action="Index">Review connection requests</a></div>
+    </div>
 </div>
 <div class="card mt-4">
     <div class="card-body">

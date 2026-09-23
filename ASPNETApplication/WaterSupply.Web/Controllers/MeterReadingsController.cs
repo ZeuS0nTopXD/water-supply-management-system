@@ -50,6 +50,11 @@ public sealed class MeterReadingsController(ApplicationDbContext context) : Cont
             return View(model);
         }
 
+        if (model.ReadingDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(model.ReadingDate), "Reading date cannot be in the future.");
+        }
+
         var connection = await context.WaterConnections
             .AsNoTracking()
             .SingleOrDefaultAsync(item => item.WaterConnectionId == model.WaterConnectionId);

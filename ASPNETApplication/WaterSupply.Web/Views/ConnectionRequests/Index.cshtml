@@ -1,0 +1,55 @@
+@model IEnumerable<ConnectionRequestListItemViewModel>
+@{ var isResident = (bool?)ViewBag.IsResident ?? User.IsInRole("Resident"); var requests = Model.ToList(); ViewData["Title"] = isResident ? "My Connection Requests" : "Connection Requests"; }
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">@(isResident ? "My connection requests" : "Review connection requests")</h1>
+        <p class="text-muted mb-0">@(isResident ? "Apply for a new water connection and track the administrator's decision." : "Review resident applications, update their status, then create the connection after approval.")</p>
+    </div>
+    @if (isResident)
+    {
+        <a class="btn btn-primary" asp-action="Create">Request a water connection</a>
+    }
+</div>
+@if (!isResident)
+{
+    <form method="get" class="row g-2 mb-3 no-print">
+        <div class="col-sm-8"><label class="visually-hidden" for="connection-request-status">Filter by status</label><select id="connection-request-status" name="status" class="form-select"><option value="">All statuses</option>@foreach (var option in Enum.GetValues<ConnectionRequestStatus>()) { <option value="@option" selected="@(ViewBag.Status is ConnectionRequestStatus selected && selected == option ? "selected" : null)">@option</option> }</select></div>
+        <div class="col-sm-4"><button class="btn btn-outline-secondary w-100" type="submit">Filter requests</button></div>
+    </form>
+}
+@if (requests.Count == 0)
+{
+    <div class="alert alert-light border">@(isResident ? "You have not submitted a connection request yet." : "No connection requests match this filter.")</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th>Resident</th><th>Requested type</th><th>Service address</th><th>Submitted</th><th>Status</th><th>Notes</th><th class="text-end">Action</th></tr></thead>
+            <tbody>
+            @foreach (var request in requests)
+            {
+                var statusClass = request.Status switch { ConnectionRequestStatus.Approved => "text-bg-success", ConnectionRequestStatus.Rejected => "text-bg-danger", ConnectionRequestStatus.InReview => "text-bg-warning", _ => "text-bg-primary" };
+                <tr>
+                    <td>@request.ResidentName</td>
+                    <td>@request.RequestedType</td>
+                    <td class="text-break">@request.ServiceAddress</td>
+                    <td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                    <td><span class="badge @statusClass">@request.StatusLabel</span></td>
+                    <td class="text-break">@(request.StaffNotes ?? request.Notes ?? "—")</td>
+                    <td class="text-end">
+                        @if (!isResident)
+                        {
+                            <a asp-action="UpdateStatus" asp-route-id="@request.WaterConnectionRequestId">Update</a>
+                            @if (request.Status == ConnectionRequestStatus.Approved)
+                            {
+                                <a class="btn btn-sm btn-outline-primary ms-2" asp-controller="WaterConnections" asp-action="Create" asp-route-residentId="@request.ResidentId">Create connection after approval</a>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

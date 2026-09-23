@@ -11,5 +11,6 @@ public sealed class DashboardSummaryViewModel
     public int OpenServiceRequestCount { get; set; }
     public int InProgressServiceRequestCount { get; set; }
     public int ClosedServiceRequestCount { get; set; }
+    public int PendingConnectionRequestCount { get; set; }
     public List<DashboardRequestViewModel> RecentRequests { get; set; } = [];
 }

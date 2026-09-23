@@ -25,10 +25,12 @@ public sealed class DemoDataSeederTests
         summary.CurrentMonthConsumption.Should().Be(101);
         summary.UnpaidBillAmount.Should().Be(505);
         summary.OpenServiceRequestCount.Should().Be(2);
+        summary.PendingConnectionRequestCount.Should().Be(1);
         (await db.Residents.CountAsync()).Should().Be(4);
         (await db.WaterConnections.CountAsync()).Should().Be(4);
         (await db.MeterReadings.CountAsync()).Should().Be(4);
         (await db.Bills.CountAsync()).Should().Be(4);
         (await db.ServiceRequests.CountAsync()).Should().Be(3);
+        (await db.WaterConnectionRequests.CountAsync()).Should().Be(1);
     }
 }

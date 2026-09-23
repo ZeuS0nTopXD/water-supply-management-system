@@ -72,6 +72,10 @@ public sealed class BillsController(ApplicationDbContext context) : Controller
         {
             ModelState.AddModelError(nameof(model.MeterReadingId), "The meter reading must belong to the selected connection.");
         }
+        else if (model.BillDate < reading.ReadingDate)
+        {
+            ModelState.AddModelError(nameof(model.BillDate), "Bill date cannot be earlier than the meter reading date.");
+        }
 
         if (await context.Bills.AnyAsync(bill =>
                 bill.WaterConnectionId == model.WaterConnectionId &&

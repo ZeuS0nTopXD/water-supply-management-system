@@ -25,8 +25,28 @@ public sealed class ResidentsController(ApplicationDbContext context) : Controll
     public async Task<IActionResult> Create(ResidentEditViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        context.Residents.Add(new Resident(0, model.FullName, model.Email, model.Phone, model.Address, model.RegistrationDate, model.IsActive));
-        await context.SaveChangesAsync();
+        if (model.RegistrationDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(model.RegistrationDate), "Registration date cannot be in the future.");
+        }
+
+        var email = model.Email.Trim();
+        if (await context.Residents.AnyAsync(resident => resident.Email.ToLower() == email.ToLower()))
+        {
+            ModelState.AddModelError(nameof(model.Email), "A resident profile with this email already exists.");
+        }
+        if (!ModelState.IsValid) return View(model);
+
+        context.Residents.Add(new Resident(0, model.FullName, email, model.Phone, model.Address, model.RegistrationDate, model.IsActive));
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(string.Empty, "The resident profile could not be saved. Please check the email and try again.");
+            return View(model);
+        }
         return RedirectToAction(nameof(Index));
     }
 
@@ -48,10 +68,27 @@ public sealed class ResidentsController(ApplicationDbContext context) : Controll
     public async Task<IActionResult> Edit(int id, ResidentEditViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
+        if (model.RegistrationDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(model.RegistrationDate), "Registration date cannot be in the future.");
+        }
         var resident = await context.Residents.FindAsync(id);
         if (resident is null) return NotFound();
+        if (await context.Residents.AnyAsync(item => item.ResidentId != id && item.Email.ToLower() == model.Email.Trim().ToLower()))
+        {
+            ModelState.AddModelError(nameof(model.Email), "A resident profile with this email already exists.");
+        }
+        if (!ModelState.IsValid) return View(model);
         context.Entry(resident).CurrentValues.SetValues(model);
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(string.Empty, "The resident profile could not be updated. Please try again.");
+            return View(model);
+        }
         return RedirectToAction(nameof(Index));
     }
 

@@ -48,3 +48,10 @@ BEGIN
     SET IDENTITY_INSERT dbo.ServiceRequests OFF;
 END
 GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.WaterConnectionRequests)
+BEGIN
+    INSERT INTO dbo.WaterConnectionRequests (ResidentId, RequestedType, ServiceAddress, Notes, CreatedAt, Status)
+    VALUES (2, N'Residential', N'Lake Road Extension', N'New home connection application for demonstration.', '2026-09-12T10:30:00', N'Pending');
+END
+GO

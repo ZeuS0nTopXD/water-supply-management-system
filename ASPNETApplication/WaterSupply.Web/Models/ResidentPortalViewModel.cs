@@ -9,6 +9,7 @@ public sealed class ResidentPortalViewModel
     public List<ResidentPortalReadingViewModel> Readings { get; init; } = [];
     public List<ResidentPortalBillViewModel> Bills { get; init; } = [];
     public List<ResidentPortalRequestViewModel> ServiceRequests { get; init; } = [];
+    public List<ResidentPortalConnectionRequestViewModel> ConnectionRequests { get; init; } = [];
 }
 
 public sealed class ResidentPortalConnectionViewModel
@@ -42,4 +43,21 @@ public sealed class ResidentPortalRequestViewModel
     public string Description { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
     public RequestStatus Status { get; init; }
+}
+
+public sealed class ResidentPortalConnectionRequestViewModel
+{
+    public ConnectionType RequestedType { get; init; }
+    public string ServiceAddress { get; init; } = string.Empty;
+    public DateTime CreatedAt { get; init; }
+    public ConnectionRequestStatus Status { get; init; }
+    public string? StaffNotes { get; init; }
+
+    public string StatusLabel => Status switch
+    {
+        ConnectionRequestStatus.InReview => "In review",
+        ConnectionRequestStatus.Approved => "Approved",
+        ConnectionRequestStatus.Rejected => "Rejected",
+        _ => "Pending"
+    };
 }

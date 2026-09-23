@@ -5,6 +5,7 @@ using WaterSupply.Domain.Enums;
 using WaterSupply.Web.Models.AccountViewModels;
 using WaterSupply.Web.Models.BillingViewModels;
 using WaterSupply.Web.Models.ConnectionViewModels;
+using WaterSupply.Web.Models.ConnectionRequestViewModels;
 using WaterSupply.Web.Models.MeterReadingViewModels;
 using WaterSupply.Web.Models.ResidentViewModels;
 using WaterSupply.Web.Models.ServiceRequestViewModels;
@@ -36,6 +37,11 @@ public sealed class FrontendLabelTests
     [InlineData(typeof(BillCreateViewModel), nameof(BillCreateViewModel.MeterReadingId), "Meter reading")]
     [InlineData(typeof(BillCreateViewModel), nameof(BillCreateViewModel.UnitsConsumed), "Units consumed")]
     [InlineData(typeof(BillCreateViewModel), nameof(BillCreateViewModel.RatePerUnit), "Rate per unit")]
+    [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.RequestedType), "Requested connection type")]
+    [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.ServiceAddress), "Service address")]
+    [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.Notes), "Additional details")]
+    [InlineData(typeof(ConnectionRequestStatusViewModel), nameof(ConnectionRequestStatusViewModel.Status), "Request status")]
+    [InlineData(typeof(ConnectionRequestStatusViewModel), nameof(ConnectionRequestStatusViewModel.StaffNotes), "Staff notes")]
     public void Form_fields_expose_human_facing_labels(Type viewModelType, string propertyName, string expectedLabel)
     {
         var property = viewModelType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
@@ -65,5 +71,14 @@ public sealed class FrontendLabelTests
         var source = File.ReadAllText(Path.GetFullPath(path));
 
         source.Should().Contain("</tfoot>");
+    }
+
+    [Fact]
+    public void Layout_loads_client_side_validation_for_every_form()
+    {
+        var layout = File.ReadAllText(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../WaterSupply.Web/Views/Shared/_Layout.cshtml")));
+
+        layout.Should().Contain("jquery.validate.min.js")
+            .And.Contain("jquery.validate.unobtrusive.min.js");
     }
 }

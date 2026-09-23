@@ -1,0 +1,10 @@
+@model ConnectionRequestStatusViewModel
+@{ ViewData["Title"] = "Update Connection Request"; }
+<h1>Update connection request</h1>
+<p class="text-muted">Use <strong>Approved</strong> when the application is accepted. Then create the actual connection from the Connections page so it receives its connection number.</p>
+<form asp-action="UpdateStatus" method="post" class="row g-3 col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="col-md-6"><label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<ConnectionRequestStatus>()" class="form-select"></select><span asp-validation-for="Status" class="text-danger small"></span></div>
+    <div class="col-12"><label asp-for="StaffNotes" class="form-label"></label><textarea asp-for="StaffNotes" class="form-control" rows="4" placeholder="Explain the decision or next step for the resident."></textarea><span asp-validation-for="StaffNotes" class="text-danger small"></span></div>
+    <div class="col-12"><button class="btn btn-primary" type="submit">Save status</button> <a asp-action="Index" class="btn btn-link">Cancel</a></div>
+</form>

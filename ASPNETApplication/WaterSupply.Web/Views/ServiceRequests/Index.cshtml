@@ -1,8 +1,11 @@
 @model IEnumerable<ServiceRequestListItemViewModel>
-@{ ViewData["Title"] = "Service Requests"; var requests = Model.ToList(); }
+@{ var isResident = User.IsInRole("Resident"); ViewData["Title"] = isResident ? "My Requests" : "Service Requests"; var requests = Model.ToList(); }
 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-    <div><h1 class="mb-1">Service requests</h1><p class="text-muted mb-0">Track issues reported by residents.</p></div>
-    <a class="btn btn-primary" asp-action="Create">Add request</a>
+    <div><h1 class="mb-1">@(isResident ? "My requests" : "Service requests")</h1><p class="text-muted mb-0">@(isResident ? "Track the issues you have reported." : "Review issues reported by residents and update their status.")</p></div>
+    @if (isResident)
+    {
+        <a class="btn btn-primary" asp-action="Create">Report a service issue</a>
+    }
 </div>
 
 @if (requests.Count == 0)

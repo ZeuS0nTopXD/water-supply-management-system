@@ -19,6 +19,14 @@ WaterSupplyManagementSystem/
 
 The project manages five business tables: `Residents`, `WaterConnections`, `MeterReadings`, `Bills`, and `ServiceRequests`. It includes separate administrator and resident workflows, connection deactivation that preserves history, human-readable connection numbers, and a lightweight PWA shell. Payments are outside the current scope.
 
+## Application workflow
+
+- Registration automatically creates a `Resident` account and resident profile. It does not create a water connection.
+- An administrator assigns a resident's water connection, records meter readings, and creates bills.
+- Residents use the Resident Portal to view their own account data and submit service requests.
+- Administrators review the service-request queue and update request statuses; they do not raise requests from the admin dashboard.
+- Staff-created resident profiles are available for cases where an administrator needs to enter a resident manually.
+
 ## Technology
 
 - .NET 10 and C#
@@ -61,6 +69,10 @@ This preview includes four residents, four connections, current-month meter read
 ### Deploy the presentation preview to Vercel
 
 The repository includes `Dockerfile.vercel` and `vercel.json` for Vercel's container runtime. The Vercel deployment runs the seeded presentation preview with in-memory data; it is intended for demonstration, not durable production records. Connect this repository to Vercel or run `vercel deploy --prod` from the repository root after authenticating with Vercel.
+
+### Deploy the presentation preview to Render
+
+The repository also includes `render.yaml`. Create a new Render Blueprint from this repository and Render will build `Dockerfile.vercel`, use the `/Account/Login` health check, and start the seeded presentation preview. This mode uses in-memory demo data so it does not require SQL Server. For durable records, set `WATER_SUPPLY_DEMO_DATA=false`, provide the MonsterASP SQL Server value as `ConnectionStrings__DefaultConnection`, and run `Database/SQLScripts/005_AddConnectionRequests.sql` on that database before switching the service to production data.
 
 ## Test and build
 

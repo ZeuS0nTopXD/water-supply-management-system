@@ -13,7 +13,7 @@ public sealed class BillCreateViewModel
     public int MeterReadingId { get; set; }
 
     [Display(Name = "Bill date")]
-    [Required]
+    [Required, DataType(DataType.Date)]
     public DateOnly BillDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     [Display(Name = "Units consumed")]

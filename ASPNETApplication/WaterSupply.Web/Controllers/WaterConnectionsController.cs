@@ -35,16 +35,21 @@ public sealed class WaterConnectionsController(ApplicationDbContext context) : C
         return View(await query.OrderBy(connection => connection.ConnectionNumber).ToListAsync());
     }
 
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(int? residentId = null)
     {
         await LoadResidentsAsync();
-        return View(new ConnectionEditViewModel());
+        return View(new ConnectionEditViewModel { ResidentId = residentId.GetValueOrDefault() });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ConnectionEditViewModel model)
     {
         if (!ModelState.IsValid) { await LoadResidentsAsync(); return View(model); }
+
+        if (model.ConnectionDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(model.ConnectionDate), "Connection date cannot be in the future.");
+        }
 
         if (!await context.Residents.AnyAsync(resident => resident.ResidentId == model.ResidentId))
         {
@@ -54,6 +59,11 @@ public sealed class WaterConnectionsController(ApplicationDbContext context) : C
         if (await context.WaterConnections.AnyAsync(connection => connection.ConnectionNumber == model.ConnectionNumber))
         {
             ModelState.AddModelError(nameof(model.ConnectionNumber), "That connection number is already in use.");
+        }
+
+        if (await context.WaterConnections.AnyAsync(connection => connection.MeterNumber == model.MeterNumber))
+        {
+            ModelState.AddModelError(nameof(model.MeterNumber), "That meter number is already in use.");
         }
 
         if (!ModelState.IsValid) { await LoadResidentsAsync(); return View(model); }
@@ -102,6 +112,11 @@ public sealed class WaterConnectionsController(ApplicationDbContext context) : C
         var connection = await context.WaterConnections.FindAsync(id);
         if (connection is null) return NotFound();
 
+        if (model.ConnectionDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(model.ConnectionDate), "Connection date cannot be in the future.");
+        }
+
         if (!await context.Residents.AnyAsync(resident => resident.ResidentId == model.ResidentId))
         {
             ModelState.AddModelError(nameof(model.ResidentId), "Select a valid resident.");
@@ -111,6 +126,12 @@ public sealed class WaterConnectionsController(ApplicationDbContext context) : C
                 item.WaterConnectionId != id && item.ConnectionNumber == model.ConnectionNumber))
         {
             ModelState.AddModelError(nameof(model.ConnectionNumber), "That connection number is already in use.");
+        }
+
+        if (await context.WaterConnections.AnyAsync(item =>
+                item.WaterConnectionId != id && item.MeterNumber == model.MeterNumber))
+        {
+            ModelState.AddModelError(nameof(model.MeterNumber), "That meter number is already in use.");
         }
 
         if (!ModelState.IsValid)

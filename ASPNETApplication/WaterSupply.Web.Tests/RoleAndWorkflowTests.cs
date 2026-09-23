@@ -358,6 +358,54 @@ public sealed class RoleAndWorkflowTests
             .Should().Contain("Update profile");
     }
 
+    [Fact]
+    public void Only_residents_can_raise_service_requests()
+    {
+        var getMethod = typeof(ServiceRequestsController).GetMethod("Create", Type.EmptyTypes);
+        var postMethod = typeof(ServiceRequestsController).GetMethod("Create", [typeof(ServiceRequestCreateViewModel)]);
+
+        getMethod.Should().NotBeNull();
+        postMethod.Should().NotBeNull();
+        getMethod!.GetCustomAttributes<AuthorizeAttribute>().Should().Contain(attribute => attribute.Roles == "Resident");
+        postMethod!.GetCustomAttributes<AuthorizeAttribute>().Should().Contain(attribute => attribute.Roles == "Resident");
+    }
+
+    [Fact]
+    public void Admin_dashboard_keeps_request_work_in_the_review_area()
+    {
+        var dashboard = ReadWebFile("Views", "Dashboard", "Index.cshtml");
+
+        dashboard.Should().NotContain("asp-controller=\"ServiceRequests\" asp-action=\"Create\"")
+            .And.Contain("Review service requests")
+            .And.Contain("Recommended workflow");
+    }
+
+    [Fact]
+    public void Resident_portal_explains_when_a_connection_is_not_assigned()
+    {
+        ReadWebFile("Views", "ResidentPortal", "Index.cshtml")
+            .Should().Contain("administrator must assign a water connection")
+            .And.Contain("Report a service issue");
+    }
+
+    [Fact]
+    public void Service_request_list_only_offers_creation_to_residents()
+    {
+        var requests = ReadWebFile("Views", "ServiceRequests", "Index.cshtml");
+
+        requests.Should().Contain("User.IsInRole(\"Resident\")")
+            .And.Contain("Report a service issue")
+            .And.NotContain(">Add request</a>");
+    }
+
+    [Fact]
+    public void Registration_explains_that_connections_are_assigned_after_signup()
+    {
+        ReadWebFile("Views", "Account", "Register.cshtml")
+            .Should().Contain("administrator")
+            .And.Contain("water connection");
+    }
+
     private static ApplicationDbContext CreateDatabase()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()

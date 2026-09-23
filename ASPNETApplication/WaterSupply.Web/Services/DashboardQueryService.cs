@@ -31,6 +31,8 @@ public sealed class DashboardQueryService(ApplicationDbContext context)
                 .CountAsync(request => request.Status == RequestStatus.InProgress),
             ClosedServiceRequestCount = await context.ServiceRequests
                 .CountAsync(request => request.Status == RequestStatus.Closed),
+            PendingConnectionRequestCount = await context.WaterConnectionRequests
+                .CountAsync(request => request.Status == ConnectionRequestStatus.Pending),
             RecentRequests = await context.ServiceRequests
                 .AsNoTracking()
                 .OrderByDescending(request => request.CreatedAt)

@@ -9,7 +9,7 @@ public sealed class MeterReadingEditViewModel
     public int WaterConnectionId { get; set; }
 
     [Display(Name = "Reading date")]
-    [Required]
+    [Required, DataType(DataType.Date)]
     public DateOnly ReadingDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     [Display(Name = "Previous reading")]

@@ -89,13 +89,28 @@ public sealed class ResidentPortalController(ApplicationDbContext context) : Con
             .OrderByDescending(request => request.CreatedAt)
             .ToListAsync();
 
+        var connectionRequests = await context.WaterConnectionRequests
+            .AsNoTracking()
+            .Where(request => request.ResidentId == resident.ResidentId)
+            .OrderByDescending(request => request.CreatedAt)
+            .Select(request => new ResidentPortalConnectionRequestViewModel
+            {
+                RequestedType = request.RequestedType,
+                ServiceAddress = request.ServiceAddress,
+                CreatedAt = request.CreatedAt,
+                Status = request.Status,
+                StaffNotes = request.StaffNotes
+            })
+            .ToListAsync();
+
         return View(new ResidentPortalViewModel
         {
             ResidentName = resident.FullName,
             Connections = connections,
             Readings = readings,
             Bills = bills,
-            ServiceRequests = requests
+            ServiceRequests = requests,
+            ConnectionRequests = connectionRequests
         });
     }
 

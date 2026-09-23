@@ -63,6 +63,12 @@ public static class DemoDataSeeder
         requests[1].ChangeStatus(RequestStatus.InProgress, "Technician visit scheduled.");
         requests[2].ChangeStatus(RequestStatus.Closed, "Meter checked and reading confirmed.");
         context.ServiceRequests.AddRange(requests);
+        context.WaterConnectionRequests.Add(
+            new WaterConnectionRequest(
+                residents[1].ResidentId,
+                ConnectionType.Residential,
+                "Lake Road Extension",
+                "New home connection application for demonstration."));
         await context.SaveChangesAsync();
     }
 

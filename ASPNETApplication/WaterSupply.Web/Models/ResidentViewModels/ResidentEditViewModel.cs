@@ -5,7 +5,7 @@ namespace WaterSupply.Web.Models.ResidentViewModels;
 public sealed class ResidentEditViewModel
 {
     [Display(Name = "Full name")]
-    [Required, StringLength(120)]
+    [Required, StringLength(120, MinimumLength = 2)]
     public string FullName { get; set; } = string.Empty;
 
     [Display(Name = "Email address")]
@@ -14,6 +14,7 @@ public sealed class ResidentEditViewModel
 
     [Display(Name = "Phone number")]
     [Required, StringLength(30)]
+    [RegularExpression(@"^\+?[0-9\s().-]{7,20}$", ErrorMessage = "Enter a valid phone number.")]
     public string Phone { get; set; } = string.Empty;
 
     [Display(Name = "Address")]
@@ -21,7 +22,7 @@ public sealed class ResidentEditViewModel
     public string Address { get; set; } = string.Empty;
 
     [Display(Name = "Registration date")]
-    [Required]
+    [Required, DataType(DataType.Date)]
     public DateOnly RegistrationDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     [Display(Name = "Active resident")]

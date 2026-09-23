@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: water-supply-management-system
+    runtime: docker
+    dockerfilePath: ./Dockerfile.vercel
+    dockerContext: .
+    healthCheckPath: /Account/Login
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: WATER_SUPPLY_DEMO_DATA
+        value: "true"
