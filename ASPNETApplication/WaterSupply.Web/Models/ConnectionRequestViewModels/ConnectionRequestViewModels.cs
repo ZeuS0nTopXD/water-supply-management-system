@@ -9,8 +9,8 @@ public sealed class ConnectionRequestCreateViewModel
     [Required, EnumDataType(typeof(ConnectionType))]
     public ConnectionType RequestedType { get; set; } = ConnectionType.Residential;
 
-    [Display(Name = "Service address")]
-    [Required, StringLength(300, MinimumLength = 5)]
+    [Display(Name = "Flat, block, or unit number")]
+    [Required, StringLength(50, MinimumLength = 1)]
     public string ServiceAddress { get; set; } = string.Empty;
 
     [Display(Name = "Additional details")]

@@ -59,7 +59,7 @@ public sealed class ConnectionRequestsController(ApplicationDbContext context) :
         var resident = await FindCurrentResidentAsync();
         if (resident is null) return Forbid();
 
-        return View(new ConnectionRequestCreateViewModel { ServiceAddress = resident.Address });
+        return View(new ConnectionRequestCreateViewModel());
     }
 
     [HttpPost, Authorize(Roles = "Resident"), ValidateAntiForgeryToken]

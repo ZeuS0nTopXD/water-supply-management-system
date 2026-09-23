@@ -1,11 +1,11 @@
 @model ConnectionRequestCreateViewModel
 @{ ViewData["Title"] = "Request a Water Connection"; }
 <h1>Request a water connection</h1>
-<p class="text-muted">Submit this application to the water supply team. An administrator will review it, contact you if needed, and create your connection after approval.</p>
+<p class="text-muted">Submit this application to the water supply team. Enter your flat, block, or unit identifier so the administrator can locate the property.</p>
 <form asp-action="Create" method="post" class="row g-3 col-lg-8">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
     <div class="col-md-6"><label asp-for="RequestedType" class="form-label"></label><select asp-for="RequestedType" asp-items="Html.GetEnumSelectList<ConnectionType>()" class="form-select"></select><span asp-validation-for="RequestedType" class="text-danger small"></span></div>
-    <div class="col-12"><label asp-for="ServiceAddress" class="form-label"></label><textarea asp-for="ServiceAddress" class="form-control" rows="2" placeholder="Where should the connection be installed?"></textarea><span asp-validation-for="ServiceAddress" class="text-danger small"></span></div>
-    <div class="col-12"><label asp-for="Notes" class="form-label"></label><textarea asp-for="Notes" class="form-control" rows="4" placeholder="Add any useful details, landmarks, or preferred contact time."></textarea><span asp-validation-for="Notes" class="text-danger small"></span></div>
+    <div class="col-12"><label asp-for="ServiceAddress" class="form-label"></label><input asp-for="ServiceAddress" class="form-control" placeholder="e.g., Flat 4B, Block A, or Unit 12" /><span asp-validation-for="ServiceAddress" class="text-danger small"></span></div>
+    <div class="col-12"><label asp-for="Notes" class="form-label"></label><textarea asp-for="Notes" class="form-control" rows="4" placeholder="Add any useful building, location, or contact details."></textarea><span asp-validation-for="Notes" class="text-danger small"></span></div>
     <div class="col-12"><button class="btn btn-primary" type="submit">Submit connection request</button> <a asp-action="Index" class="btn btn-link">Cancel</a></div>
 </form>

@@ -13,7 +13,7 @@
         }
         else
         {
-            <div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Type</th><th>Address</th><th>Submitted</th><th>Status</th><th>Administrator note</th></tr></thead><tbody>@foreach (var request in Model.ConnectionRequests.Take(5)) { <tr><td>@request.RequestedType</td><td class="text-break">@request.ServiceAddress</td><td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td><td>@request.StatusLabel</td><td class="text-break">@(request.StaffNotes ?? "Awaiting review")</td></tr> }</tbody></table></div>
+            <div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Type</th><th>Flat, block, or unit</th><th>Submitted</th><th>Status</th><th>Administrator note</th></tr></thead><tbody>@foreach (var request in Model.ConnectionRequests.Take(5)) { <tr><td>@request.RequestedType</td><td class="text-break">@request.ServiceAddress</td><td>@request.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td><td>@request.StatusLabel</td><td class="text-break">@(request.StaffNotes ?? "Awaiting review")</td></tr> }</tbody></table></div>
         }
     </div>
 </section>

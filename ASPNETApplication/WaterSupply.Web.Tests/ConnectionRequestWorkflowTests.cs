@@ -58,6 +58,28 @@ public sealed class ConnectionRequestWorkflowTests
     }
 
     [Fact]
+    public async Task Resident_connection_form_uses_a_property_identifier_not_the_profile_address()
+    {
+        await using var db = CreateDatabase();
+        db.Residents.Add(new Resident(1, "Asha Patil", "asha@example.com", "9876543210", "Main Road", new DateOnly(2026, 1, 1), identityUserId: "asha-user"));
+        await db.SaveChangesAsync();
+
+        var controller = new ConnectionRequestsController(db)
+        {
+            ControllerContext = ContextFor("asha-user", "Resident")
+        };
+
+        var result = await controller.Create();
+        var model = result.Should().BeOfType<ViewResult>().Subject.Model.Should().BeOfType<ConnectionRequestCreateViewModel>().Subject;
+
+        model.ServiceAddress.Should().BeEmpty();
+        ReadWebFile("Views", "ConnectionRequests", "Create.cshtml")
+            .Should().Contain("asp-for=\"ServiceAddress\"")
+            .And.Contain("e.g., Flat 4B, Block A, or Unit 12")
+            .And.NotContain("Where should the connection be installed?");
+    }
+
+    [Fact]
     public async Task Resident_connection_request_list_is_scoped_to_the_signed_in_resident()
     {
         await using var db = CreateDatabase();

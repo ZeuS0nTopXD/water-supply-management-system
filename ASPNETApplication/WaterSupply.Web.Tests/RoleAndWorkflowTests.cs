@@ -377,7 +377,7 @@ public sealed class RoleAndWorkflowTests
 
         dashboard.Should().NotContain("asp-controller=\"ServiceRequests\" asp-action=\"Create\"")
             .And.Contain("Review service requests")
-            .And.Contain("Recommended workflow");
+            .And.NotContain("Recommended workflow");
     }
 
     [Fact]

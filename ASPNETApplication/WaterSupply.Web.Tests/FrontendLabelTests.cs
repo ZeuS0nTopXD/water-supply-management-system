@@ -38,7 +38,7 @@ public sealed class FrontendLabelTests
     [InlineData(typeof(BillCreateViewModel), nameof(BillCreateViewModel.UnitsConsumed), "Units consumed")]
     [InlineData(typeof(BillCreateViewModel), nameof(BillCreateViewModel.RatePerUnit), "Rate per unit")]
     [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.RequestedType), "Requested connection type")]
-    [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.ServiceAddress), "Service address")]
+    [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.ServiceAddress), "Flat, block, or unit number")]
     [InlineData(typeof(ConnectionRequestCreateViewModel), nameof(ConnectionRequestCreateViewModel.Notes), "Additional details")]
     [InlineData(typeof(ConnectionRequestStatusViewModel), nameof(ConnectionRequestStatusViewModel.Status), "Request status")]
     [InlineData(typeof(ConnectionRequestStatusViewModel), nameof(ConnectionRequestStatusViewModel.StaffNotes), "Staff notes")]

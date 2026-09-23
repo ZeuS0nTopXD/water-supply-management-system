@@ -17,7 +17,7 @@ public sealed class WaterConnectionRequest
         int id = 0)
     {
         if (residentId <= 0) throw new DomainValidationException("A valid resident is required.");
-        if (string.IsNullOrWhiteSpace(serviceAddress)) throw new DomainValidationException("A service address is required.");
+        if (string.IsNullOrWhiteSpace(serviceAddress)) throw new DomainValidationException("A flat, block, or unit identifier is required.");
 
         WaterConnectionRequestId = id;
         ResidentId = residentId;

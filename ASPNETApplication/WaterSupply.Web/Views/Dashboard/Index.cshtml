@@ -18,14 +18,6 @@
     <a class="btn btn-sm btn-outline-primary" asp-controller="Bills" asp-action="Create">Add bill</a>
     <a class="btn btn-sm btn-outline-secondary" asp-controller="ServiceRequests" asp-action="Index">Review service requests</a>
 </div>
-<div class="alert alert-info no-print" role="note">
-    <h2 class="h6 mb-2">Recommended workflow</h2>
-    <ol class="mb-0 ps-3">
-        <li>Registered users already appear as residents; use <strong>Add resident profile</strong> only for staff-created records.</li>
-        <li>Assign each resident a water connection, then record readings and create bills.</li>
-        <li>Residents submit connection applications or report service issues from their portal; staff review both queues here.</li>
-    </ol>
-</div>
 <div class="row g-3">
     <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted">Residents</div><div class="display-6">@Model.ResidentCount</div></div></div></div>
     <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted">Active connections</div><div class="display-6">@Model.ActiveConnectionCount</div></div></div></div>
